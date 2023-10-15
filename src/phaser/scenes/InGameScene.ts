@@ -9,11 +9,13 @@ import { Button } from "@/phaser/ui/upgrade/Button";
 export const UI = {
   height: 200,
 };
+const initHealth = 20;
 export class InGameScene extends Phaser.Scene {
   healthBar: HealthBar;
   bunker: Bunker;
   enemies: Phaser.Physics.Arcade.Group;
   timer: Phaser.Time.TimerEvent;
+  missiles: Phaser.Physics.Arcade.Group;
 
   constructor() {
     super("InGameScene");
@@ -22,6 +24,7 @@ export class InGameScene extends Phaser.Scene {
     this.load.tilemapTiledJSON("map", "assets/tiled/map.json");
     this.load.image("Terrian", "assets/tiled/Tile1.0.1/Terrian.png");
     this.load.image("bunker", "assets/bunker_100x100.png");
+    this.load.image("missile", "assets/bullet_8x8.png");
     this.load.spritesheet("pixel_animals", "assets/pixel_animals.png", {
       frameWidth: 16,
       frameHeight: 16,
@@ -30,42 +33,43 @@ export class InGameScene extends Phaser.Scene {
   create() {
     // createTitleText(this, "Select Level", 100);
     this.createUI(this);
+    this.createMap(this);
 
     this.bunker = new Bunker(this);
     this.healthBar = new HealthBar(
       this,
       this.bunker.x - HealthBarConfig.width / 2,
       this.bunker.y - 40,
-      100
+      initHealth
     );
     this.enemies = this.physics.add.group();
-    this.physics.add.collider(this.enemies, this.bunker, (bunker, enemy) => {
+    this.missiles = this.physics.add.group();
+    this.createEnemy();
+
+    this.physics.add.collider(this.enemies, this.missiles, (enemy, missile) => {
+      console.log("missile collide", missile);
+      missile.destroy();
+      enemy.destroy();
+      this.createBoomAnimation({
+        x: (enemy as any).x,
+        y: (enemy as any).y,
+        text: "+1",
+      });
+    });
+    this.physics.add.collider(this.enemies, this.bunker, (_bunker, enemy) => {
       enemy.destroy();
       this.healthBar.decrease(1);
+      console.log("this.healthBar.value", this.healthBar.value);
+
       if (this.healthBar.value === 0) {
-        bunker.destroy();
-        this.healthBar.bar.destroy();
+        this.bunker.setAlpha(0.1);
+        // this.healthBar.bar.destroy();
         // overlay game over
         // this.scene.start("StartScene");
+        return;
       }
     });
-    this.createEnemy();
   }
-  update() {
-    // if (
-    //   !this.closestEnemy
-    //   //  || (this.closestEnemy as any).isDestroyed()
-    // ) {
-    //   this.destroy();
-    //   return;
-    // }
-    // this.scene.physics.moveToObject(
-    //   this,
-    //   this.closestEnemy,
-    //   GAME.speed * Missile.SPEED
-    // );
-  }
-
   createUI(scene: Phaser.Scene) {
     const uiContainer = scene.add.container(
       0,
@@ -80,9 +84,8 @@ export class InGameScene extends Phaser.Scene {
         UI.height
       )
       .setOrigin(0, 0)
-      .setDepth(100)
       .setScrollFactor(0)
-      .setFillStyle(0x00ff00, 0.2);
+      .setFillStyle(0x00ff00);
     // const button = new SelectLevelButton(scene, 100, 100, 1);
     const buttons = [
       { id: "addSoldier", desc: "add new random attacker +1" },
@@ -104,7 +107,7 @@ export class InGameScene extends Phaser.Scene {
       });
       return button;
     });
-    uiContainer.add([uiWrap, ...buttons]);
+    uiContainer.add([uiWrap, ...buttons]).setDepth(9999);
   }
   createMap(scene: Phaser.Scene) {
     const map = scene.make.tilemap({
@@ -121,6 +124,9 @@ export class InGameScene extends Phaser.Scene {
     this.timer = this.time.addEvent({
       delay: 1000 / GAME.speed,
       callback: () => {
+        if (this.healthBar.value === 0) {
+          return;
+        }
         const { phase, hp, spriteKey, frameNo } = phaseData[index];
         const direction = Phaser.Math.RND.integerInRange(0, 3);
         let x, y;
@@ -160,6 +166,22 @@ export class InGameScene extends Phaser.Scene {
       },
       loop: true,
       callbackScope: this,
+    });
+  }
+  createBoomAnimation({ x, y, text }: { x: number; y: number; text: string }) {
+    const boomText = this.add.text(x, y, text, {
+      fontSize: "12px",
+      color: "#84b4c8",
+    });
+    this.tweens.add({
+      targets: boomText,
+      y: y - 50,
+      alpha: 0,
+      duration: 1500,
+      ease: "Power2",
+      onComplete: () => {
+        boomText.destroy();
+      },
     });
   }
 }

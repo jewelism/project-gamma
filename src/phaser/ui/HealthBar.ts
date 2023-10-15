@@ -8,13 +8,17 @@ export class HealthBar {
   y: number;
   value: number;
   p: number;
+  maxHealth: number;
   constructor(scene: Phaser.Scene, x: number, y: number, maxHealth: number) {
-    this.bar = new Phaser.GameObjects.Graphics(scene);
+    this.bar = new Phaser.GameObjects.Graphics(scene)
+      .setDepth(100)
+      .setAlpha(0.3);
 
     this.x = x;
     this.y = y;
     this.value = maxHealth;
-    this.p = 76 / 100;
+    this.maxHealth = maxHealth;
+    this.p = 76 / this.maxHealth;
 
     this.draw();
 
@@ -54,7 +58,7 @@ export class HealthBar {
       HealthBarConfig.height - 4
     );
 
-    if (this.value < 30) {
+    if (this.value < (this.maxHealth / 100) * 30) {
       this.bar.fillStyle(0xff0000);
     } else {
       this.bar.fillStyle(0x00ff00);

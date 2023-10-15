@@ -23,20 +23,21 @@ export class PixelAnimal extends Phaser.Physics.Arcade.Sprite {
     scene.physics.world.enableBody(this);
     scene.physics.add.existing(this);
 
-    this.setOrigin(0, 0)
-      .setScale(2)
-      .setCircle(4, 3, 4)
-      .setDepth(9)
-      .setImmovable(true)
-      .setCollideWorldBounds(true);
+    this.setScale(2).setDepth(9).setCollideWorldBounds(true);
 
     // this.setImmovable(true);
   }
   preUpdate() {
     this.moveToBunker();
   }
+  isDestroyed() {
+    return !this.active;
+  }
   moveToBunker() {
-    // this.setVelocity(0, 0);
+    if (!(this.scene as any).bunker.scene) {
+      this.setVelocity(0, 0);
+      return;
+    }
     this.anims.play(`pixel_animals_move${this.frameNo}`, true);
     this.scene.physics.moveToObject(
       this,

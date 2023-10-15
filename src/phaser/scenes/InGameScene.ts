@@ -1,14 +1,26 @@
 // import { createTitleText } from "@/phaser/phaserUtils/titleText";
+import { GAME } from "@/phaser/constants";
+import { getPhaseData } from "@/phaser/constants/phase";
+import { Bunker } from "@/phaser/objects/Bunker";
+import { PixelAnimal } from "@/phaser/objects/PixelAnimal";
 import { HealthBar, HealthBarConfig } from "@/phaser/ui/HealthBar";
 import { Button } from "@/phaser/ui/upgrade/Button";
 
-const uiHeight = 200;
+export const UI = {
+  height: 200,
+};
 export class InGameScene extends Phaser.Scene {
   healthBar: HealthBar;
+  bunker: Bunker;
+  enemies: Phaser.Physics.Arcade.Group;
+  timer: Phaser.Time.TimerEvent;
+
   constructor() {
     super("InGameScene");
   }
   preload() {
+    this.load.tilemapTiledJSON("map", "assets/tiled/map.json");
+    this.load.image("Terrian", "assets/tiled/Tile1.0.1/Terrian.png");
     this.load.image("bunker", "assets/bunker_100x100.png");
     this.load.spritesheet("pixel_animals", "assets/pixel_animals.png", {
       frameWidth: 16,
@@ -18,26 +30,46 @@ export class InGameScene extends Phaser.Scene {
   create() {
     // createTitleText(this, "Select Level", 100);
     this.createUI(this);
-    this.createBunker(this);
-  }
-  createBunker(scene: Phaser.Scene) {
-    const bunkerSprite = scene.add.sprite(0, 0, "bunker");
+
+    this.bunker = new Bunker(this);
     this.healthBar = new HealthBar(
-      scene,
-      bunkerSprite.x - HealthBarConfig.width / 2,
-      bunkerSprite.y - 40,
+      this,
+      this.bunker.x - HealthBarConfig.width / 2,
+      this.bunker.y - 40,
       100
     );
-    scene.add.container(
-      Number(scene.game.config.width) / 2,
-      Number(scene.game.config.height) / 2 - uiHeight / 2,
-      [bunkerSprite, this.healthBar.bar]
-    );
+    this.enemies = this.physics.add.group();
+    this.physics.add.collider(this.enemies, this.bunker, (bunker, enemy) => {
+      enemy.destroy();
+      this.healthBar.decrease(1);
+      if (this.healthBar.value === 0) {
+        bunker.destroy();
+        this.healthBar.bar.destroy();
+        // overlay game over
+        // this.scene.start("StartScene");
+      }
+    });
+    this.createEnemy();
   }
+  update() {
+    // if (
+    //   !this.closestEnemy
+    //   //  || (this.closestEnemy as any).isDestroyed()
+    // ) {
+    //   this.destroy();
+    //   return;
+    // }
+    // this.scene.physics.moveToObject(
+    //   this,
+    //   this.closestEnemy,
+    //   GAME.speed * Missile.SPEED
+    // );
+  }
+
   createUI(scene: Phaser.Scene) {
     const uiContainer = scene.add.container(
       0,
-      Number(scene.game.config.height) - uiHeight
+      Number(scene.game.config.height) - UI.height
     );
     const uiWrap = scene.add
       .rectangle(
@@ -45,7 +77,7 @@ export class InGameScene extends Phaser.Scene {
         0,
         // Number(scene.game.config.height) - height,
         Number(scene.game.config.width),
-        uiHeight
+        UI.height
       )
       .setOrigin(0, 0)
       .setDepth(100)
@@ -74,21 +106,60 @@ export class InGameScene extends Phaser.Scene {
     });
     uiContainer.add([uiWrap, ...buttons]);
   }
-  createMap(scene: Phaser.Scene, mapKey: string) {
+  createMap(scene: Phaser.Scene) {
     const map = scene.make.tilemap({
-      key: mapKey,
+      key: "map",
     });
-    const jew_pastel_lineTiles = map.addTilesetImage(
-      "jew_pastel_line",
-      "jew_pastel_line"
-    );
-    const collision_layer = map.createLayer("bg_collision", [
-      jew_pastel_lineTiles,
-    ]);
-    collision_layer.setCollisionByExclusion([-1]);
+    const terrianTiles = map.addTilesetImage("Terrian", "Terrian");
+    map.createLayer("bg", terrianTiles);
+  }
+  createEnemy() {
+    const phaseData = getPhaseData();
+    let index = 0;
+    let count = 0;
 
-    const bunkerSpawnPoints = map.findObject("BunkerSpawn", ({ name }) => {
-      return name.includes("BunkerSpawn");
+    this.timer = this.time.addEvent({
+      delay: 1000 / GAME.speed,
+      callback: () => {
+        const { phase, hp, spriteKey, frameNo } = phaseData[index];
+        const direction = Phaser.Math.RND.integerInRange(0, 3);
+        let x, y;
+        if (direction === 0) {
+          x = Phaser.Math.RND.integerInRange(
+            0,
+            this.cameras.main.worldView.right
+          );
+          y = this.cameras.main.worldView.top - 50;
+        } else if (direction === 1) {
+          x = this.cameras.main.worldView.right + 50;
+          y = Phaser.Math.RND.integerInRange(
+            0,
+            this.cameras.main.worldView.bottom
+          );
+        } else if (direction === 2) {
+          x = Phaser.Math.RND.integerInRange(
+            0,
+            this.cameras.main.worldView.right
+          );
+          y = this.cameras.main.worldView.bottom + 50;
+        } else if (direction === 3) {
+          x = this.cameras.main.worldView.left - 50;
+          y = Phaser.Math.RND.integerInRange(
+            0,
+            this.cameras.main.worldView.bottom
+          );
+        }
+
+        const pixelAnimal = new PixelAnimal(this, {
+          x,
+          y,
+          frameNo: 0,
+        });
+        this.enemies.add(pixelAnimal);
+        count++;
+      },
+      loop: true,
+      callbackScope: this,
     });
   }
 }

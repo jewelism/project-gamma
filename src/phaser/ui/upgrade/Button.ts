@@ -1,9 +1,7 @@
-import { getUIStyle } from "@/phaser/constants";
-
 export class Button extends Phaser.GameObjects.Container {
   constructor(
     scene: Phaser.Scene,
-    { x, y, width, height, hoverText, onClick }
+    { x, y, width, height, spriteKey, hoverText, onClick }
   ) {
     super(scene, x, y);
     const textPadding = 20;
@@ -18,6 +16,7 @@ export class Button extends Phaser.GameObjects.Container {
         align: "center",
       }
     ).setOrigin(0);
+
     const textWrap = new Phaser.GameObjects.Rectangle(
       scene,
       0,
@@ -28,8 +27,15 @@ export class Button extends Phaser.GameObjects.Container {
       .setFillStyle(0x0000ff, 0.5)
       .setOrigin(0);
     const textContainer = scene.add
-      .container(-150, -50, [textWrap, buttonText])
-      .setVisible(false);
+      .container(
+        this.scene.cameras.main.worldView.centerX - buttonText.displayWidth / 2,
+        this.scene.cameras.main.worldView.bottom -
+          buttonText.displayHeight -
+          30,
+        [textWrap, buttonText]
+      )
+      .setVisible(false)
+      .setDepth(9999);
 
     // const sprite = scene.add.sprite(100, 100, 'village').setInteractive()
     // sprite.setOrigin(0, 0).setScale(0.1)
@@ -54,20 +60,32 @@ export class Button extends Phaser.GameObjects.Container {
       .setOrigin(0, 0)
       .setInteractive()
       .on("pointerdown", () => {
-        button.setAlpha(0.2);
+        textContainer.setVisible(true);
+        button.setAlpha(0.4);
+        icon.setAlpha(0.4);
         onClick();
       })
       .on("pointerup", () => {
         button.setAlpha(1);
+        icon.setAlpha(1);
+        // textContainer.setVisible(false);
       })
       .on("pointerover", () => {
         textContainer.setVisible(true);
       })
       .on("pointerout", () => {
+        button.setAlpha(1);
+        icon.setAlpha(1);
         textContainer.setVisible(false);
       });
+    const icon = new Phaser.GameObjects.Sprite(
+      scene,
+      button.width / 2,
+      button.height / 2,
+      spriteKey
+    );
 
-    this.add([button, textContainer]);
+    this.add([button, icon]);
     scene.add.existing(this);
   }
 }

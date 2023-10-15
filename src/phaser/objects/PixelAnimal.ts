@@ -1,16 +1,10 @@
 export class PixelAnimal extends Phaser.Physics.Arcade.Sprite {
-  attackTimer: Phaser.Time.TimerEvent;
-  attackRange: number = 100;
-  attackSpeed: number = 300;
-  damage: number;
-  cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   moveSpeed: number = 150;
   frameNo: number;
-  moveTimer: Phaser.Time.TimerEvent;
+  hp: number;
 
-  constructor(scene, { x, y, frameNo }) {
+  constructor(scene, { x, y, hp, frameNo }) {
     super(scene, x, y, "pixel_animals", frameNo);
-    this.damage = 1;
     this.anims.create({
       key: `pixel_animals_move${frameNo}`,
       frames: this.anims.generateFrameNames("pixel_animals", {
@@ -19,6 +13,8 @@ export class PixelAnimal extends Phaser.Physics.Arcade.Sprite {
     });
 
     this.frameNo = frameNo;
+    this.hp = hp;
+
     scene.add.existing(this);
     scene.physics.world.enableBody(this);
     scene.physics.add.existing(this);

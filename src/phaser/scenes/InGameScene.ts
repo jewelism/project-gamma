@@ -29,6 +29,21 @@ export class InGameScene extends Phaser.Scene {
       frameWidth: 16,
       frameHeight: 16,
     });
+    this.load.spritesheet("sword1", "assets/upgrade_icon.png", {
+      frameWidth: 32,
+      frameHeight: 32,
+      startFrame: 0,
+    });
+    this.load.spritesheet("defence1", "assets/upgrade_icon.png", {
+      frameWidth: 32,
+      frameHeight: 32,
+      startFrame: 3,
+    });
+    this.load.spritesheet("book1", "assets/upgrade_icon.png", {
+      frameWidth: 32,
+      frameHeight: 32,
+      startFrame: 6,
+    });
   }
   create() {
     // createTitleText(this, "Select Level", 100);
@@ -50,7 +65,7 @@ export class InGameScene extends Phaser.Scene {
       console.log("missile collide", missile);
       missile.destroy();
       enemy.destroy();
-      this.createBoomAnimation({
+      this.createBoomAnimation(this, {
         x: (enemy as any).x,
         y: (enemy as any).y,
         text: "+1",
@@ -88,20 +103,24 @@ export class InGameScene extends Phaser.Scene {
       .setFillStyle(0x00ff00);
     // const button = new SelectLevelButton(scene, 100, 100, 1);
     const buttons = [
-      { id: "addSoldier", desc: "add new random attacker +1" },
-      { id: "attackDamage", desc: "increase attack damage 1%" },
-      { id: "attackSpeed", desc: "increase attack speed 1%" },
-      { id: "income", desc: "increase income +0.5%" },
-      { id: "upgradeBunker", desc: "upgrade bunker" },
-    ].map(({ id, desc }, index) => {
+      { id: "income", spriteKey: "book1", desc: "increase income +0.5%" },
+      { id: "addSoldier", spriteKey: "", desc: "add new random attacker +1" },
+      { id: "attackSpeed", spriteKey: "", desc: "increase attack speed 1%" },
+      {
+        id: "attackDamage",
+        spriteKey: "sword1",
+        desc: "increase attack damage 1%",
+      },
+      { id: "upgradeBunker", spriteKey: "defence1", desc: "upgrade bunker" },
+    ].map(({ id, spriteKey, desc }, index) => {
       const button = new Button(scene, {
         x: Number(scene.game.config.width) - 50 * (index + 1),
         y: 0,
         width: 50,
         height: 50,
+        spriteKey,
         hoverText: desc,
         onClick: () => {
-          console.log("click", this, button, id);
           this.events.emit("upgrade", id);
         },
       });
@@ -159,7 +178,8 @@ export class InGameScene extends Phaser.Scene {
         const pixelAnimal = new PixelAnimal(this, {
           x,
           y,
-          frameNo: 0,
+          hp,
+          frameNo,
         });
         this.enemies.add(pixelAnimal);
         count++;
@@ -168,12 +188,15 @@ export class InGameScene extends Phaser.Scene {
       callbackScope: this,
     });
   }
-  createBoomAnimation({ x, y, text }: { x: number; y: number; text: string }) {
-    const boomText = this.add.text(x, y, text, {
-      fontSize: "12px",
+  createBoomAnimation(
+    scene,
+    { x, y, text }: { x: number; y: number; text: string }
+  ) {
+    const boomText = scene.add.text(x, y, text, {
+      fontSize: "14px",
       color: "#84b4c8",
     });
-    this.tweens.add({
+    scene.tweens.add({
       targets: boomText,
       y: y - 50,
       alpha: 0,

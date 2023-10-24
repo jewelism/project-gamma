@@ -12,6 +12,7 @@ export function createTitleText(scene: Phaser.Scene, text: string, y?: number) {
       color: "#fff",
       align: "center",
     })
-    .setOrigin(0.5, 0.5);
+    .setOrigin(0.5, 0.5)
+    .setDepth(9999);
   return title;
 }

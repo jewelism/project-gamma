@@ -1,21 +1,21 @@
 // import { createTitleText } from "@/phaser/phaserUtils/titleText";
-import { GAME } from "@/phaser/constants";
+import { GAME, INIT, UI } from "@/phaser/constants";
 import { getPhaseData } from "@/phaser/constants/phase";
 import { Bunker } from "@/phaser/objects/Bunker";
 import { PixelAnimal } from "@/phaser/objects/PixelAnimal";
+import { createTitleText } from "@/phaser/phaserUtils/titleText";
+import { EaseText } from "@/phaser/ui/EaseText";
+import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { HealthBar, HealthBarConfig } from "@/phaser/ui/HealthBar";
 import { Button } from "@/phaser/ui/upgrade/Button";
 
-export const UI = {
-  height: 200,
-};
-const initHealth = 20;
 export class InGameScene extends Phaser.Scene {
   healthBar: HealthBar;
   bunker: Bunker;
   enemies: Phaser.Physics.Arcade.Group;
   timer: Phaser.Time.TimerEvent;
   missiles: Phaser.Physics.Arcade.Group;
+  gaugeBar: GaugeBar;
 
   constructor() {
     super("InGameScene");
@@ -51,38 +51,61 @@ export class InGameScene extends Phaser.Scene {
     this.createMap(this);
 
     this.bunker = new Bunker(this);
+
+    this.gaugeBar = new GaugeBar(this, {
+      x: this.bunker.x - HealthBarConfig.width / 2,
+      y: this.bunker.y + 40,
+      max: INIT.soliderCountMax,
+      value: INIT.soliderCount,
+    });
     this.healthBar = new HealthBar(
       this,
       this.bunker.x - HealthBarConfig.width / 2,
       this.bunker.y - 40,
-      initHealth
+      INIT.health
     );
     this.enemies = this.physics.add.group();
     this.missiles = this.physics.add.group();
     this.createEnemy();
 
     this.physics.add.collider(this.enemies, this.missiles, (enemy, missile) => {
-      console.log("missile collide", missile);
       missile.destroy();
       enemy.destroy();
-      this.createBoomAnimation(this, {
+      new EaseText(this, {
         x: (enemy as any).x,
         y: (enemy as any).y,
         text: "+1",
+        color: "#84b4c8",
       });
     });
     this.physics.add.collider(this.enemies, this.bunker, (_bunker, enemy) => {
       enemy.destroy();
       this.healthBar.decrease(1);
-      console.log("this.healthBar.value", this.healthBar.value);
 
       if (this.healthBar.value === 0) {
         this.bunker.setAlpha(0.1);
+
+        createTitleText(this, "Game Over", Number(this.game.config.height) / 2);
+        this.time.delayedCall(500, () => {
+          const onKeydown = () => {
+            this.scene.start("StartScene");
+          };
+          this.input.keyboard.on("keydown", onKeydown);
+          this.input.on("pointerdown", onKeydown);
+        });
         // this.healthBar.bar.destroy();
         // overlay game over
         // this.scene.start("StartScene");
         return;
       }
+
+      this.bunker.flash();
+      new EaseText(this, {
+        x: (enemy as any).x,
+        y: (enemy as any).y,
+        text: "boom!",
+        color: "#ff0000",
+      });
     });
   }
   createUI(scene: Phaser.Scene) {
@@ -141,7 +164,7 @@ export class InGameScene extends Phaser.Scene {
     let count = 0;
 
     this.timer = this.time.addEvent({
-      delay: 1000 / GAME.speed,
+      delay: 100 / GAME.speed,
       callback: () => {
         if (this.healthBar.value === 0) {
           return;
@@ -186,25 +209,6 @@ export class InGameScene extends Phaser.Scene {
       },
       loop: true,
       callbackScope: this,
-    });
-  }
-  createBoomAnimation(
-    scene,
-    { x, y, text }: { x: number; y: number; text: string }
-  ) {
-    const boomText = scene.add.text(x, y, text, {
-      fontSize: "14px",
-      color: "#84b4c8",
-    });
-    scene.tweens.add({
-      targets: boomText,
-      y: y - 50,
-      alpha: 0,
-      duration: 1500,
-      ease: "Power2",
-      onComplete: () => {
-        boomText.destroy();
-      },
     });
   }
 }

@@ -1,6 +1,5 @@
-import { GAME } from "@/phaser/constants";
+import { GAME, UI } from "@/phaser/constants";
 import { Missile } from "@/phaser/objects/Missile";
-import { UI } from "@/phaser/scenes/InGameScene";
 
 export class Bunker extends Phaser.Physics.Arcade.Sprite {
   attackRange: number = 300;
@@ -53,5 +52,16 @@ export class Bunker extends Phaser.Physics.Arcade.Sprite {
       .setY(this.y);
 
     (this.scene as any).missiles.add(missile);
+  }
+  flash() {
+    this.setTint(0xff0000);
+    this.scene.time.delayedCall(
+      100,
+      () => {
+        this.clearTint();
+      },
+      [],
+      this
+    );
   }
 }

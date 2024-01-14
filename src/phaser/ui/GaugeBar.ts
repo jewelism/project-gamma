@@ -1,89 +1,39 @@
-import { ToolTip } from "@/phaser/ui/ToolTip";
-
-export const GaugeBarConfig = {
-  width: 80,
-  height: 16,
+const BAR = {
+  WIDTH: 70,
+  HEIGHT: 6,
 };
-export class GaugeBar {
-  bar: Phaser.GameObjects.Graphics;
-  x: number;
-  y: number;
-  value: number;
-  p: number;
+
+export class GaugeBar extends Phaser.GameObjects.Graphics {
   max: number;
-  constructor(
-    scene: Phaser.Scene,
-    { x, y, max, value }: { x: number; y: number; max: number; value: number }
-  ) {
-    this.bar = new Phaser.GameObjects.Graphics(scene)
-      .setDepth(100)
-      .setAlpha(0.3);
+  value: number;
 
-    this.x = x;
-    this.y = y;
-    this.value = value;
+  // TODO: 컬러 셋팅할수있도록 변경
+  constructor(scene, { max, value }: { max: number; value?: number }) {
+    super(scene);
+
     this.max = max;
-    this.p = 76 / this.max;
+    this.value = value ? value : max;
 
-    // const tooltip = new ToolTip(scene, { x, y, hoverText: "asdfasdfas" });
-
-    // this.bar
-    //   .setInteractive()
-    //   .on("pointerover", () => {
-    //     // event not working
-    //     console.log("pointerover");
-    //     tooltip.setVisible(true);
-    //   })
-    //   .on("pointerout", () => {
-    //     // event not working
-    //     console.log("pointerout");
-    //     tooltip.setVisible(false);
-    //   });
-    this.draw();
-    scene.add.existing(this.bar);
+    scene.add.existing(this);
+    this.updateBar(this.value);
   }
+  updateBar(value: number) {
+    this.clear();
+    this.fillStyle(0xff0000, 1);
+    const width = (value / this.max) * BAR.WIDTH;
 
-  decrease(amount) {
-    this.value -= amount;
+    const ownerBarGapY = 10;
 
-    if (this.value < 0) {
-      this.value = 0;
-    }
-
-    this.draw();
-
-    return this.value === 0;
+    this.fillRect(-BAR.WIDTH / 2, ownerBarGapY, width, BAR.HEIGHT);
+    this.strokeRect(-BAR.WIDTH / 2, ownerBarGapY, BAR.WIDTH, BAR.HEIGHT);
+    this.strokePath();
   }
-
-  draw() {
-    this.bar.clear();
-
-    //  BG
-    this.bar.fillStyle(0x000000);
-    this.bar.fillRect(
-      this.x,
-      this.y,
-      GaugeBarConfig.width,
-      GaugeBarConfig.height
-    );
-
-    //  Health
-    this.bar.fillStyle(0xffffff);
-    this.bar.fillRect(
-      this.x + 2,
-      this.y + 2,
-      GaugeBarConfig.width - 4,
-      GaugeBarConfig.height - 4
-    );
-
-    this.bar.fillStyle(0xfff);
-
-    this.bar.fillRect(
-      this.x + 2,
-      this.y + 2,
-      Math.floor(this.p * this.value),
-      12
-    );
-    return this.bar;
+  increase(value: number) {
+    this.value += value;
+    this.updateBar(this.value);
+  }
+  decrease(value: number) {
+    this.value -= value;
+    this.updateBar(this.value);
   }
 }

@@ -6,12 +6,10 @@ import { PixelAnimal } from "@/phaser/objects/PixelAnimal";
 import { createTitleText } from "@/phaser/phaserUtils/titleText";
 import { EaseText } from "@/phaser/ui/EaseText";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
-import { HealthBar, HealthBarConfig } from "@/phaser/ui/HealthBar";
 import { ResourceState } from "@/phaser/ui/ResourceState";
 import { Button } from "@/phaser/ui/upgrade/Button";
 
 export class InGameScene extends Phaser.Scene {
-  healthBar: HealthBar;
   bunker: Bunker;
   enemies: Phaser.Physics.Arcade.Group;
   timer: Phaser.Time.TimerEvent;
@@ -43,18 +41,13 @@ export class InGameScene extends Phaser.Scene {
 
     this.bunker = new Bunker(this);
 
-    this.gaugeBar = new GaugeBar(this, {
-      x: this.bunker.x - HealthBarConfig.width / 2,
-      y: this.bunker.y + 40,
-      max: INIT.soliderCountMax,
-      value: INIT.soliderCount,
-    });
-    this.healthBar = new HealthBar(
-      this,
-      this.bunker.x - HealthBarConfig.width / 2,
-      this.bunker.y - 40,
-      INIT.health
-    );
+    // this.gaugeBar = new GaugeBar(this, {
+    //   x: this.bunker.x - HealthBarConfig.width / 2,
+    //   y: this.bunker.y + 40,
+    //   max: INIT.soliderCountMax,
+    //   value: INIT.soliderCount,
+    // });
+
     this.enemies = this.physics.add.group();
     this.missiles = this.physics.add.group();
     this.createEnemy();
@@ -72,26 +65,24 @@ export class InGameScene extends Phaser.Scene {
     });
     this.physics.add.collider(this.enemies, this.bunker, (_bunker, enemy) => {
       enemy.destroy();
-      this.healthBar.decrease(1);
+      this.bunker.decreaseHealth(1);
 
-      if (this.healthBar.value === 0) {
+      if (this.bunker.hpBar.value === 0) {
         this.bunker.setAlpha(0.1);
 
         createTitleText(this, "Game Over", Number(this.game.config.height) / 2);
-        this.time.delayedCall(500, () => {
+        this.time.delayedCall(300, () => {
           const onKeydown = () => {
             this.scene.start("StartScene");
           };
           this.input.keyboard.on("keydown", onKeydown);
           this.input.on("pointerdown", onKeydown);
         });
-        // this.healthBar.bar.destroy();
         // overlay game over
         // this.scene.start("StartScene");
         return;
       }
 
-      this.bunker.flash();
       new EaseText(this, {
         x: (enemy as any).x,
         y: (enemy as any).y,
@@ -113,9 +104,9 @@ export class InGameScene extends Phaser.Scene {
     let count = 0;
 
     this.timer = this.time.addEvent({
-      delay: 1000 / GAME.speed,
+      delay: 100 / GAME.speed,
       callback: () => {
-        if (this.healthBar.value === 0) {
+        if (this.bunker.hpBar.value === 0) {
           return;
         }
         const { phase, hp, spriteKey, frameNo } = phaseData[index];

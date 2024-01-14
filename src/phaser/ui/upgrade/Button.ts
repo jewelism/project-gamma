@@ -2,9 +2,20 @@ import { TEXT_STYLE } from "@/phaser/constants";
 import { ToolTip } from "@/phaser/ui/ToolTip";
 
 export class Button extends Phaser.GameObjects.Container {
+  grade: Phaser.GameObjects.Text;
   constructor(
     scene: Phaser.Scene,
-    { x, y, width, height, spriteKey, hoverText, shortcutText, onClick }
+    {
+      x,
+      y,
+      width,
+      height,
+      spriteKey,
+      hoverText,
+      shortcutText,
+      enableGrade = false,
+      onClick,
+    }
   ) {
     super(scene, x, y);
     const tooltip = new ToolTip(scene, { x, y, hoverText });
@@ -46,18 +57,30 @@ export class Button extends Phaser.GameObjects.Container {
     );
     const shortcut = new Phaser.GameObjects.Text(
       scene,
-      button.width - 10,
+      10,
       10,
       shortcutText,
       TEXT_STYLE
     ).setOrigin(0.5, 0.5);
+    this.grade = new Phaser.GameObjects.Text(
+      scene,
+      button.width - 10,
+      button.height - 10,
+      "1",
+      TEXT_STYLE
+    ).setOrigin(0.5, 0.5);
 
+    // TODO: progress 추가
     this.add([button, icon, shortcut]);
+    enableGrade && this.add(this.grade);
     scene.add.existing(this);
 
     scene.input.keyboard
       .addKey(Phaser.Input.Keyboard.KeyCodes[shortcutText])
       .on("down", onKeyDown)
       .on("up", onKeyUp);
+  }
+  setGrade(grade: number) {
+    this.grade.setText(`${grade}`);
   }
 }

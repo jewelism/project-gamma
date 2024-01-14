@@ -2,6 +2,7 @@ import * as Phaser from "phaser";
 
 import { StartScene } from "@/phaser/scenes/StartScene";
 import { InGameScene } from "@/phaser/scenes/InGameScene";
+import { InGameUIScene } from "@/phaser/scenes/InGameUIScene";
 
 const config: Phaser.Types.Core.GameConfig = {
   title: "project alpha",
@@ -25,6 +26,7 @@ const config: Phaser.Types.Core.GameConfig = {
   scene: [
     // StartScene,
     InGameScene,
+    InGameUIScene,
   ],
   backgroundColor: "#222",
   // fps: {

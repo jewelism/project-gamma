@@ -7,6 +7,7 @@ import { createTitleText } from "@/phaser/phaserUtils/titleText";
 import { EaseText } from "@/phaser/ui/EaseText";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { HealthBar, HealthBarConfig } from "@/phaser/ui/HealthBar";
+import { ResourceState } from "@/phaser/ui/ResourceState";
 import { Button } from "@/phaser/ui/upgrade/Button";
 
 export class InGameScene extends Phaser.Scene {
@@ -16,6 +17,11 @@ export class InGameScene extends Phaser.Scene {
   timer: Phaser.Time.TimerEvent;
   missiles: Phaser.Physics.Arcade.Group;
   gaugeBar: GaugeBar;
+  resourceStates: {
+    gold: ResourceState;
+    star: ResourceState;
+    decreaseByUpgrade: (payload: { gold?: number; star?: number }) => void;
+  };
 
   constructor() {
     super("InGameScene");
@@ -29,25 +35,10 @@ export class InGameScene extends Phaser.Scene {
       frameWidth: 16,
       frameHeight: 16,
     });
-    this.load.spritesheet("sword1", "assets/upgrade_icon.png", {
-      frameWidth: 32,
-      frameHeight: 32,
-      startFrame: 0,
-    });
-    this.load.spritesheet("defence1", "assets/upgrade_icon.png", {
-      frameWidth: 32,
-      frameHeight: 32,
-      startFrame: 3,
-    });
-    this.load.spritesheet("book1", "assets/upgrade_icon.png", {
-      frameWidth: 32,
-      frameHeight: 32,
-      startFrame: 6,
-    });
   }
   create() {
+    this.scene.launch("InGameUIScene");
     // createTitleText(this, "Select Level", 100);
-    this.createUI(this);
     this.createMap(this);
 
     this.bunker = new Bunker(this);
@@ -77,6 +68,7 @@ export class InGameScene extends Phaser.Scene {
         text: "+1",
         color: "#84b4c8",
       });
+      this.resourceStates.gold.increase(1);
     });
     this.physics.add.collider(this.enemies, this.bunker, (_bunker, enemy) => {
       enemy.destroy();
@@ -108,49 +100,6 @@ export class InGameScene extends Phaser.Scene {
       });
     });
   }
-  createUI(scene: Phaser.Scene) {
-    const uiContainer = scene.add.container(
-      0,
-      Number(scene.game.config.height) - UI.height
-    );
-    const uiWrap = scene.add
-      .rectangle(
-        0,
-        0,
-        // Number(scene.game.config.height) - height,
-        Number(scene.game.config.width),
-        UI.height
-      )
-      .setOrigin(0, 0)
-      .setScrollFactor(0)
-      .setFillStyle(0x00ff00);
-    // const button = new SelectLevelButton(scene, 100, 100, 1);
-    const buttons = [
-      { id: "income", spriteKey: "book1", desc: "increase income +0.5%" },
-      { id: "addSoldier", spriteKey: "", desc: "add new random attacker +1" },
-      { id: "attackSpeed", spriteKey: "", desc: "increase attack speed 1%" },
-      {
-        id: "attackDamage",
-        spriteKey: "sword1",
-        desc: "increase attack damage 1%",
-      },
-      { id: "upgradeBunker", spriteKey: "defence1", desc: "upgrade bunker" },
-    ].map(({ id, spriteKey, desc }, index) => {
-      const button = new Button(scene, {
-        x: Number(scene.game.config.width) - 50 * (index + 1),
-        y: 0,
-        width: 50,
-        height: 50,
-        spriteKey,
-        hoverText: desc,
-        onClick: () => {
-          this.events.emit("upgrade", id);
-        },
-      });
-      return button;
-    });
-    uiContainer.add([uiWrap, ...buttons]).setDepth(9999);
-  }
   createMap(scene: Phaser.Scene) {
     const map = scene.make.tilemap({
       key: "map",
@@ -164,7 +113,7 @@ export class InGameScene extends Phaser.Scene {
     let count = 0;
 
     this.timer = this.time.addEvent({
-      delay: 100 / GAME.speed,
+      delay: 1000 / GAME.speed,
       callback: () => {
         if (this.healthBar.value === 0) {
           return;

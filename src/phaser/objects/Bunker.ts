@@ -1,5 +1,6 @@
 import { GAME, UI } from "@/phaser/constants";
 import { Missile } from "@/phaser/objects/Missile";
+import { InGameScene } from "@/phaser/scenes/InGameScene";
 
 export class Bunker extends Phaser.Physics.Arcade.Sprite {
   attackRange: number = 300;
@@ -22,19 +23,23 @@ export class Bunker extends Phaser.Physics.Arcade.Sprite {
       this.attackTimer = this.scene.time.delayedCall(
         this.attackSpeed / GAME.speed,
         () => {
-          this.shoot();
+          this.shootToClosestEnemy();
           this.attackTimer = null;
         }
       );
     }
   }
-  shoot() {
-    if ((this.scene as any).enemies?.getChildren().length === 0) {
+  isDestroyed() {
+    return !this.active || (this.scene as InGameScene).healthBar.value <= 0;
+  }
+  shootToClosestEnemy() {
+    const scene = this.scene as InGameScene;
+    if (scene.enemies?.getChildren().length === 0) {
       return;
     }
     const closestEnemy = this.scene.physics.closest(
       this,
-      (this.scene as any).enemies.getChildren()
+      scene.enemies.getChildren()
     );
     const distance = Phaser.Math.Distance.Between(
       this.x,
@@ -51,7 +56,7 @@ export class Bunker extends Phaser.Physics.Arcade.Sprite {
       .setX(this.x)
       .setY(this.y);
 
-    (this.scene as any).missiles.add(missile);
+    scene.missiles.add(missile);
   }
   flash() {
     this.setTint(0xff0000);
@@ -63,5 +68,8 @@ export class Bunker extends Phaser.Physics.Arcade.Sprite {
       [],
       this
     );
+  }
+  getUpgradeCost(id) {
+    return 100;
   }
 }

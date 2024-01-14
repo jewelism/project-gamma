@@ -1,13 +1,11 @@
 import { TEXT_STYLE } from "@/phaser/constants";
-import { ToolTip } from "@/phaser/ui/ToolTip";
 
-export class Button extends Phaser.GameObjects.Container {
+export class IconButton extends Phaser.GameObjects.Container {
   constructor(
     scene: Phaser.Scene,
-    { x, y, width, height, spriteKey, hoverText, shortcutText, onClick }
+    { x, y, width, height, shortcutText, spriteKey, onClick }
   ) {
     super(scene, x, y);
-    const tooltip = new ToolTip(scene, { x, y, hoverText });
 
     const onKeyDown = () => {
       if (!onClick) {
@@ -27,17 +25,10 @@ export class Button extends Phaser.GameObjects.Container {
       .setOrigin(0, 0)
       .setInteractive()
       .on("pointerdown", () => {
-        tooltip.setVisible(true);
         onKeyDown();
       })
       .on("pointerup", onKeyUp)
-      .on("pointerover", () => {
-        tooltip.setVisible(true);
-      })
-      .on("pointerout", () => {
-        onKeyUp();
-        tooltip.setVisible(false);
-      });
+      .on("pointerout", onKeyUp);
     const icon = new Phaser.GameObjects.Sprite(
       scene,
       button.width / 2,
@@ -52,7 +43,13 @@ export class Button extends Phaser.GameObjects.Container {
       TEXT_STYLE
     ).setOrigin(0.5, 0.5);
 
-    this.add([button, icon, shortcut]);
+    const buttonContainer = new Phaser.GameObjects.Container(scene, 0, 0, [
+      button,
+      icon,
+      shortcut,
+    ]);
+
+    this.add(buttonContainer);
     scene.add.existing(this);
 
     scene.input.keyboard

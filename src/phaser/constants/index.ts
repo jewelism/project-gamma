@@ -9,8 +9,8 @@ export const INIT = {
   health: 20,
   money: 10,
   income: 1,
-  soliderCount: 1,
-  soliderCountMax: 3,
+  soldierCount: 2,
+  soldierCountMax: 5,
 };
 
 export const INIT_PLAYER_STATE_LIST = [

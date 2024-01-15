@@ -1,11 +1,15 @@
 import { GAME } from "@/phaser/constants";
+import { AttackerInBunker } from "@/phaser/objects/AttackerInBunker";
 
 export class Missile extends Phaser.Physics.Arcade.Sprite {
   static SPEED = 500;
   closestEnemy: Phaser.GameObjects.GameObject;
+  shooter: AttackerInBunker;
 
   constructor(scene, { shooter }) {
     super(scene, shooter.x, shooter.y, "missile");
+
+    this.shooter = shooter;
 
     scene.add.existing(this);
     scene.physics.world.enableBody(this);
@@ -19,8 +23,13 @@ export class Missile extends Phaser.Physics.Arcade.Sprite {
     this.moveToClosestEnemy();
   }
   moveToClosestEnemy() {
-    if (!this.closestEnemy || (this.closestEnemy as any).isDestroyed()) {
+    if (!this.closestEnemy) {
       this.destroy();
+      return;
+    }
+    if ((this.closestEnemy as any).isDestroyed()) {
+      this.destroy();
+      this.shooter.shootToClosestEnemy();
       return;
     }
     this.scene.physics.moveToObject(

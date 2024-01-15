@@ -104,7 +104,7 @@ export class InGameScene extends Phaser.Scene {
     let count = 0;
 
     this.timer = this.time.addEvent({
-      delay: 100 / GAME.speed,
+      delay: 500 / GAME.speed,
       callback: () => {
         if (this.bunker.hpBar.value === 0) {
           return;

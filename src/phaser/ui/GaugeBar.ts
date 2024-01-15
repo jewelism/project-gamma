@@ -29,11 +29,25 @@ export class GaugeBar extends Phaser.GameObjects.Graphics {
     this.strokePath();
   }
   increase(value: number) {
-    this.value += value;
+    if (this.value >= this.max) {
+      return;
+    }
+    if (this.value + value > this.max) {
+      this.value = this.max;
+    } else {
+      this.value += value;
+    }
     this.updateBar(this.value);
   }
   decrease(value: number) {
-    this.value -= value;
+    if (this.value <= 0) {
+      return;
+    }
+    if (this.value - value < 0) {
+      this.value = 0;
+    } else {
+      this.value -= value;
+    }
     this.updateBar(this.value);
   }
 }

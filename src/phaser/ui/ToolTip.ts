@@ -1,11 +1,12 @@
 export class ToolTip extends Phaser.GameObjects.Container {
+  buttonText: Phaser.GameObjects.Text;
   constructor(
     scene: Phaser.Scene,
     { x, y, hoverText }: { x: number; y: number; hoverText: string }
   ) {
     super(scene, x, y);
     const textPadding = 20;
-    const buttonText = new Phaser.GameObjects.Text(
+    this.buttonText = new Phaser.GameObjects.Text(
       scene,
       textPadding / 2,
       textPadding / 2 / 2,
@@ -20,18 +21,21 @@ export class ToolTip extends Phaser.GameObjects.Container {
       scene,
       0,
       0,
-      buttonText.displayWidth + textPadding,
-      buttonText.displayHeight + textPadding / 2
+      this.buttonText.displayWidth + textPadding,
+      this.buttonText.displayHeight + textPadding / 2
     )
       .setFillStyle(0x0000ff, 0.5)
       .setOrigin(0);
 
-    this.add([textWrap, buttonText])
+    this.add([textWrap, this.buttonText])
       .setX(
-        this.scene.cameras.main.worldView.centerX - buttonText.displayWidth / 2
+        this.scene.cameras.main.worldView.centerX -
+          this.buttonText.displayWidth / 2
       )
       .setY(
-        this.scene.cameras.main.worldView.bottom - buttonText.displayHeight - 30
+        this.scene.cameras.main.worldView.bottom -
+          this.buttonText.displayHeight -
+          30
       )
       .setVisible(false)
       .setDepth(9999);

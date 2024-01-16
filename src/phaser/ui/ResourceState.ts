@@ -41,10 +41,12 @@ export class ResourceState extends Phaser.GameObjects.Container {
   increase(amount: number) {
     this.value += amount;
     this.text.setText(String(this.value));
+    return this;
   }
   decrease(amount: number) {
     this.value -= amount;
     this.text.setText(String(this.value));
+    return this;
   }
   setXAll(x: number) {
     this.setX(x);

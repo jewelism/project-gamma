@@ -2,7 +2,7 @@ import { GAME } from "@/phaser/constants";
 import { AttackerInBunker } from "@/phaser/objects/AttackerInBunker";
 
 export class Missile extends Phaser.Physics.Arcade.Sprite {
-  static SPEED = 500;
+  static SPEED = 750;
   closestEnemy: Phaser.GameObjects.GameObject;
   shooter: AttackerInBunker;
 

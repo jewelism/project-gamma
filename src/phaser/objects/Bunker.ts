@@ -1,4 +1,4 @@
-import { INIT, UI } from "@/phaser/constants";
+import { UI } from "@/phaser/constants";
 import { UPGRADE } from "@/phaser/constants/upgrade";
 import { AttackerInBunker } from "@/phaser/objects/AttackerInBunker";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
@@ -18,10 +18,9 @@ export class Bunker extends Phaser.GameObjects.Container {
     );
 
     this.sprite = new Phaser.Physics.Arcade.Sprite(scene, 0, 0, "bunker");
-    this.hpBar = new GaugeBar(this.scene, { max: INIT.health }).setPosition(
-      0,
-      -40
-    );
+    this.hpBar = new GaugeBar(this.scene, {
+      max: UPGRADE.upgradeBunker.value * 10,
+    }).setPosition(0, -40);
     this.shooterGaugeBar = new GaugeBar(this.scene, {
       max: UPGRADE.addSoldier.max,
       value: UPGRADE.addSoldier.value,
@@ -30,7 +29,7 @@ export class Bunker extends Phaser.GameObjects.Container {
 
     this.soldiers = new Phaser.GameObjects.Group(
       scene,
-      Array.from({ length: INIT.soldierCount }).map(
+      Array.from({ length: UPGRADE.addSoldier.value }).map(
         (_, i) =>
           new AttackerInBunker(this.scene, { owner: this, grade: i + 1 })
       )

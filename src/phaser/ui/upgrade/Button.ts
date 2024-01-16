@@ -3,9 +3,10 @@ import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { ToolTip } from "@/phaser/ui/ToolTip";
 
 export class Button extends Phaser.GameObjects.Container {
-  grade: Phaser.GameObjects.Text;
   progress: GaugeBar;
   tooltip: ToolTip;
+  shortcutText: Phaser.GameObjects.Text;
+  countText: Phaser.GameObjects.Text;
 
   constructor(
     scene: Phaser.Scene,
@@ -17,7 +18,7 @@ export class Button extends Phaser.GameObjects.Container {
       spriteKey,
       tooltipText,
       shortcutText,
-      enableGrade = false,
+      enableCountText = false,
       progressTime,
       onClick,
     }: {
@@ -28,7 +29,7 @@ export class Button extends Phaser.GameObjects.Container {
       spriteKey: string;
       tooltipText: string;
       shortcutText?: string;
-      enableGrade?: boolean;
+      enableCountText?: boolean;
       progressTime?: number;
       onClick?: () => void;
     }
@@ -72,16 +73,16 @@ export class Button extends Phaser.GameObjects.Container {
       spriteKey
     );
 
-    this.grade = new Phaser.GameObjects.Text(
+    this.countText = new Phaser.GameObjects.Text(
       scene,
       button.width - 10,
       button.height - 10,
-      "1",
+      "0",
       TEXT_STYLE
     ).setOrigin(0.5, 0.5);
 
     this.add([button, icon]);
-    enableGrade && this.add(this.grade);
+    enableCountText && this.add(this.countText);
     scene.add.existing(this);
     if (progressTime) {
       this.progress = new GaugeBar(scene, {
@@ -98,29 +99,31 @@ export class Button extends Phaser.GameObjects.Container {
     }
 
     if (shortcutText) {
-      this.add(
-        new Phaser.GameObjects.Text(
-          scene,
-          10,
-          10,
-          shortcutText,
-          TEXT_STYLE
-        ).setOrigin(0.5, 0.5)
-      );
+      this.shortcutText = new Phaser.GameObjects.Text(
+        scene,
+        10,
+        10,
+        shortcutText,
+        TEXT_STYLE
+      ).setOrigin(0.5, 0.5);
+      this.add(this.shortcutText);
       scene.input.keyboard
         .addKey(Phaser.Input.Keyboard.KeyCodes[shortcutText])
         .on("down", onKeyDown)
         .on("up", onKeyUp);
     }
     this.on("upgradeComplete", () => {
-      this.setGrade(Number(this.grade.text) + 1);
+      this.increaseCountText();
     });
   }
   setTooltipText(text: string) {
     this.tooltip.buttonText.setText(text);
   }
-  setGrade(grade: number) {
-    this.grade.setText(`${grade}`);
+  setCountText(grade: number) {
+    this.countText.setText(`${grade}`);
+  }
+  increaseCountText(amount: number = 1) {
+    this.setCountText(Number(this.countText.text) + amount);
   }
   setProgressTime(time: number) {
     this.progress.max = time;

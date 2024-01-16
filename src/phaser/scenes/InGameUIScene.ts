@@ -6,9 +6,11 @@ import { Button } from "@/phaser/ui/upgrade/Button";
 import { UPGRADE, getAttackDamageGradeById } from "@/phaser/constants/upgrade";
 import { AttackerInBunker } from "@/phaser/objects/AttackerInBunker";
 import { EaseText } from "@/phaser/ui/EaseText";
+import { AttackerStateButton } from "@/phaser/ui/upgrade/AttackerStateButton";
 
 export class InGameUIScene extends Phaser.Scene {
   uiContainer: Phaser.GameObjects.Container;
+  attackerStateButtonGroup: Phaser.GameObjects.Group;
   constructor() {
     super("InGameUIScene");
   }
@@ -57,11 +59,17 @@ export class InGameUIScene extends Phaser.Scene {
       },
     };
     this.createUI(this);
-    InGameScene.bunker.soldiers
-      .getChildren()
-      .forEach((soldier: AttackerInBunker, index) => {
-        this.addAttackersStateUI(this, soldier, index);
+    this.createAttackersStateButton(this);
+    Array.from({ length: UPGRADE.addSoldier.value }).forEach((_) => {
+      const initGrade = 1;
+      const soldier = new AttackerInBunker(InGameScene, {
+        owner: InGameScene.bunker,
+        grade: initGrade,
       });
+      this.increaseAttackersStateButton(initGrade);
+      InGameScene.bunker.soldiers.add(soldier);
+    });
+
     this.createTimer(1, () => {
       console.log("game over");
     });
@@ -89,7 +97,7 @@ export class InGameUIScene extends Phaser.Scene {
           height: 50,
           spriteKey,
           tooltipText: desc,
-          enableGrade: true,
+          enableCountText: true,
           shortcutText,
           onClick: () => {
             const InGameScene = this.scene.get("InGameScene") as InGameScene;
@@ -118,15 +126,11 @@ export class InGameUIScene extends Phaser.Scene {
               new EaseText(InGameScene, {
                 x: InGameScene.bunker.x - InGameScene.bunker.width,
                 y: InGameScene.bunker.y - InGameScene.bunker.height,
-                text: `+ grade ${grade}`,
+                text: `+ ★${grade}`,
                 color: "#ff0000",
                 duration: 3000,
-              });
-              this.addAttackersStateUI(
-                this,
-                soldier,
-                InGameScene.bunker.soldiers.getChildren().length - 1
-              );
+              }).setFontSize(20);
+              this.increaseAttackersStateButton(grade);
             }
             if (id.startsWith("attackDamage")) {
               const [gradeStart, gradeEnd] = getAttackDamageGradeById(id);
@@ -149,23 +153,38 @@ export class InGameUIScene extends Phaser.Scene {
       });
     this.uiContainer.add([uiWrap, ...buttons]).setDepth(9999);
   }
-  addAttackersStateUI(scene: Phaser.Scene, soldier: AttackerInBunker, index) {
+  increaseAttackersStateButton(grade: number) {
+    const button = this.attackerStateButtonGroup
+      .getChildren()
+      .find(({ name }) => name === `grade${grade}`);
+    (button as Button).increaseCountText();
+  }
+  createAttackersStateButton(scene: Phaser.Scene) {
     const inGameScene = this.scene.get("InGameScene") as InGameScene;
-
-    const button = new Button(scene, {
-      x: 50 * index,
-      y: 0, // TODO: x 좌표가 다 차면 y 좌표를 내려야함
-      width: 50,
-      height: 50,
-      spriteKey: "star",
-      tooltipText: "remove this soldier",
-      enableGrade: false,
-      shortcutText: `${soldier.grade}`,
-      onClick: () => {
-        inGameScene.bunker.soldiers.remove(soldier);
-      },
+    const attackerStateButtons = Array.from({ length: 9 }, (_, index) => {
+      const grade = index + 1;
+      const button = new AttackerStateButton(scene, {
+        x: 50 * index,
+        y: 0, // TODO: x 좌표가 다 차면 y 좌표를 내려야함
+        width: 50,
+        height: 50,
+        spriteKey: "star",
+        tooltipText: "remove this soldier",
+        gradeText: `★${grade}`,
+        onClick: () => {
+          const soldier = inGameScene.bunker.soldiers
+            .getChildren()
+            .find((sol: AttackerInBunker) => sol.grade === grade);
+          inGameScene.bunker.soldiers.remove(soldier);
+        },
+      }).setName(`grade${grade}`);
+      this.uiContainer.add(button);
+      return button;
     });
-    this.uiContainer.add(button);
+    this.attackerStateButtonGroup = new Phaser.GameObjects.Group(
+      scene,
+      attackerStateButtons
+    );
   }
   createTimer(min: number, callback: () => void) {
     let remainingTime = min * 60;

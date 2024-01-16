@@ -27,12 +27,7 @@ export class Bunker extends Phaser.GameObjects.Container {
       color: 0x000000,
     }).setPosition(0, 20);
 
-    this.soldiers = new Phaser.GameObjects.Group(
-      scene,
-      Array.from({ length: UPGRADE.addSoldier.value }).map(
-        (_) => new AttackerInBunker(this.scene, { owner: this, grade: 1 })
-      )
-    );
+    this.soldiers = new Phaser.GameObjects.Group(scene);
 
     this.add([this.sprite, this.hpBar, this.shooterGaugeBar]);
     scene.physics.add.existing(this, true);
@@ -45,8 +40,5 @@ export class Bunker extends Phaser.GameObjects.Container {
   decreaseHealth(damage: number) {
     this.hpBar.decrease(damage);
     createFlashFn()(this.sprite);
-  }
-  getUpgradeCost(id) {
-    return 100;
   }
 }

@@ -1,8 +1,11 @@
 import { TEXT_STYLE } from "@/phaser/constants";
+import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { ToolTip } from "@/phaser/ui/ToolTip";
 
 export class Button extends Phaser.GameObjects.Container {
   grade: Phaser.GameObjects.Text;
+  progress: GaugeBar;
+
   constructor(
     scene: Phaser.Scene,
     {
@@ -14,6 +17,7 @@ export class Button extends Phaser.GameObjects.Container {
       hoverText,
       shortcutText,
       enableGrade = false,
+      progressTime = 5,
       onClick,
     }
   ) {
@@ -69,10 +73,20 @@ export class Button extends Phaser.GameObjects.Container {
       "1",
       TEXT_STYLE
     ).setOrigin(0.5, 0.5);
+    this.progress = new GaugeBar(scene, {
+      max: progressTime,
+      value: 0,
+      width: button.width,
+      height: 5,
+      color: 0x00ffff,
+    })
+      .setPosition(button.width / 2, button.height)
+      .setAlpha(0);
+    this.setProgressTime(progressTime);
 
-    // TODO: progress 추가
     this.add([button, icon, shortcut]);
     enableGrade && this.add(this.grade);
+    this.add(this.progress);
     scene.add.existing(this);
 
     scene.input.keyboard
@@ -82,5 +96,21 @@ export class Button extends Phaser.GameObjects.Container {
   }
   setGrade(grade: number) {
     this.grade.setText(`${grade}`);
+  }
+  setProgressTime(time: number) {
+    this.progress.max = time;
+    this.progress.setAlpha(1);
+    const timerEvent = this.scene.time.addEvent({
+      delay: 1000, // 1초마다 실행
+      callback: () => {
+        this.progress.increase(1);
+        if (this.progress.value >= this.progress.max) {
+          timerEvent.remove();
+          this.progress.setAlpha(0);
+          this.emit(`upgrade_${this.name}`);
+        }
+      },
+      loop: true, // 이벤트를 계속 반복
+    });
   }
 }

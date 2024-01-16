@@ -1,31 +1,50 @@
-const BAR = {
-  WIDTH: 70,
-  HEIGHT: 6,
-};
-
 export class GaugeBar extends Phaser.GameObjects.Graphics {
   max: number;
   value: number;
+  width: number;
+  height: number;
+  color: number;
+  lineColor: number;
 
-  // TODO: 컬러 셋팅할수있도록 변경
-  constructor(scene, { max, value }: { max: number; value?: number }) {
+  constructor(
+    scene,
+    {
+      max,
+      value,
+      width = 70,
+      height = 6,
+      color = 0xff0000,
+      lineColor = 0x000000,
+    }: {
+      max: number;
+      value?: number;
+      width?: number;
+      height?: number;
+      color?: number;
+      lineColor?: number;
+    }
+  ) {
     super(scene);
 
     this.max = max;
-    this.value = value ? value : max;
+    this.width = width;
+    this.height = height;
+    this.color = color;
+    this.lineColor = lineColor;
+    this.value = value !== undefined ? value : max;
 
-    scene.add.existing(this);
     this.updateBar(this.value);
   }
   updateBar(value: number) {
     this.clear();
-    this.fillStyle(0xff0000, 1);
-    const width = (value / this.max) * BAR.WIDTH;
+    this.fillStyle(this.color, 1);
+    const valueWidth = (value / this.max) * this.width;
 
     const ownerBarGapY = 10;
 
-    this.fillRect(-BAR.WIDTH / 2, ownerBarGapY, width, BAR.HEIGHT);
-    this.strokeRect(-BAR.WIDTH / 2, ownerBarGapY, BAR.WIDTH, BAR.HEIGHT);
+    this.fillRect(-this.width / 2, ownerBarGapY, valueWidth, this.height);
+    this.lineStyle(1, this.lineColor);
+    this.strokeRect(-this.width / 2, ownerBarGapY, this.width, this.height);
     this.strokePath();
   }
   increase(value: number) {

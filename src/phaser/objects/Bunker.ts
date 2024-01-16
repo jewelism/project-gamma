@@ -24,6 +24,7 @@ export class Bunker extends Phaser.GameObjects.Container {
     this.shooterGaugeBar = new GaugeBar(this.scene, {
       max: INIT.soldierCountMax,
       value: INIT.soldierCount,
+      color: 0x000000,
     }).setPosition(0, 20);
 
     this.soldiers = new Phaser.GameObjects.Group(

@@ -1,20 +1,17 @@
 // import { createTitleText } from "@/phaser/phaserUtils/titleText";
-import { GAME, INIT, UI } from "@/phaser/constants";
+import { GAME } from "@/phaser/constants";
 import { getPhaseData } from "@/phaser/constants/phase";
 import { Bunker } from "@/phaser/objects/Bunker";
 import { PixelAnimal } from "@/phaser/objects/PixelAnimal";
 import { createTitleText } from "@/phaser/phaserUtils/titleText";
 import { EaseText } from "@/phaser/ui/EaseText";
-import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { ResourceState } from "@/phaser/ui/ResourceState";
-import { Button } from "@/phaser/ui/upgrade/Button";
 
 export class InGameScene extends Phaser.Scene {
   bunker: Bunker;
   enemies: Phaser.Physics.Arcade.Group;
   timer: Phaser.Time.TimerEvent;
   missiles: Phaser.Physics.Arcade.Group;
-  gaugeBar: GaugeBar;
   resourceStates: {
     gold: ResourceState;
     star: ResourceState;

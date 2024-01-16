@@ -1,12 +1,11 @@
 import { TEXT_STYLE } from "@/phaser/constants";
-import { UPGRADE } from "@/phaser/constants/upgrade";
-import { InGameScene } from "@/phaser/scenes/InGameScene";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { ToolTip } from "@/phaser/ui/ToolTip";
 
 export class Button extends Phaser.GameObjects.Container {
   grade: Phaser.GameObjects.Text;
   progress: GaugeBar;
+  tooltip: ToolTip;
 
   constructor(
     scene: Phaser.Scene,
@@ -16,15 +15,26 @@ export class Button extends Phaser.GameObjects.Container {
       width,
       height,
       spriteKey,
-      hoverText,
+      tooltipText,
       shortcutText,
       enableGrade = false,
-      progressTime = 5,
+      progressTime,
       onClick,
+    }: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      spriteKey: string;
+      tooltipText: string;
+      shortcutText?: string;
+      enableGrade?: boolean;
+      progressTime?: number;
+      onClick?: () => void;
     }
   ) {
     super(scene, x, y);
-    const tooltip = new ToolTip(scene, { x, y, hoverText });
+    this.tooltip = new ToolTip(scene, { x, y, hoverText: tooltipText });
 
     const onKeyDown = () => {
       if (!onClick) {
@@ -44,16 +54,16 @@ export class Button extends Phaser.GameObjects.Container {
       .setOrigin(0, 0)
       .setInteractive()
       .on("pointerdown", () => {
-        tooltip.setVisible(true);
+        this.tooltip.setVisible(true);
         onKeyDown();
       })
       .on("pointerup", onKeyUp)
       .on("pointerover", () => {
-        tooltip.setVisible(true);
+        this.tooltip.setVisible(true);
       })
       .on("pointerout", () => {
         onKeyUp();
-        tooltip.setVisible(false);
+        this.tooltip.setVisible(false);
       });
     const icon = new Phaser.GameObjects.Sprite(
       scene,
@@ -61,13 +71,7 @@ export class Button extends Phaser.GameObjects.Container {
       button.height / 2,
       spriteKey
     );
-    const shortcut = new Phaser.GameObjects.Text(
-      scene,
-      10,
-      10,
-      shortcutText,
-      TEXT_STYLE
-    ).setOrigin(0.5, 0.5);
+
     this.grade = new Phaser.GameObjects.Text(
       scene,
       button.width - 10,
@@ -75,29 +79,45 @@ export class Button extends Phaser.GameObjects.Container {
       "1",
       TEXT_STYLE
     ).setOrigin(0.5, 0.5);
-    this.progress = new GaugeBar(scene, {
-      max: progressTime,
-      value: 0,
-      width: button.width,
-      height: 5,
-      color: 0x00ffff,
-    })
-      .setPosition(button.width / 2, button.height)
-      .setAlpha(0);
-    this.setProgressTime(progressTime);
 
-    this.add([button, icon, shortcut]);
+    this.add([button, icon]);
     enableGrade && this.add(this.grade);
-    this.add(this.progress);
     scene.add.existing(this);
+    if (progressTime) {
+      this.progress = new GaugeBar(scene, {
+        max: progressTime,
+        value: 0,
+        width: button.width,
+        height: 5,
+        color: 0x00ffff,
+      })
+        .setPosition(button.width / 2, button.height)
+        .setAlpha(0);
+      this.setProgressTime(progressTime);
+      this.add(this.progress);
+    }
 
-    scene.input.keyboard
-      .addKey(Phaser.Input.Keyboard.KeyCodes[shortcutText])
-      .on("down", onKeyDown)
-      .on("up", onKeyUp);
+    if (shortcutText) {
+      this.add(
+        new Phaser.GameObjects.Text(
+          scene,
+          10,
+          10,
+          shortcutText,
+          TEXT_STYLE
+        ).setOrigin(0.5, 0.5)
+      );
+      scene.input.keyboard
+        .addKey(Phaser.Input.Keyboard.KeyCodes[shortcutText])
+        .on("down", onKeyDown)
+        .on("up", onKeyUp);
+    }
     this.on("upgradeComplete", () => {
       this.setGrade(Number(this.grade.text) + 1);
     });
+  }
+  setTooltipText(text: string) {
+    this.tooltip.buttonText.setText(text);
   }
   setGrade(grade: number) {
     this.grade.setText(`${grade}`);

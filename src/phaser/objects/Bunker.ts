@@ -30,8 +30,7 @@ export class Bunker extends Phaser.GameObjects.Container {
     this.soldiers = new Phaser.GameObjects.Group(
       scene,
       Array.from({ length: UPGRADE.addSoldier.value }).map(
-        (_, i) =>
-          new AttackerInBunker(this.scene, { owner: this, grade: i + 1 })
+        (_) => new AttackerInBunker(this.scene, { owner: this, grade: 1 })
       )
     );
 

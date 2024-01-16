@@ -1,18 +1,14 @@
 import { InGameScene } from "@/phaser/scenes/InGameScene";
 import { ResourceState } from "@/phaser/ui/ResourceState";
-import { IconButton } from "@/phaser/ui/IconButton";
-import { getUpgradeMax, updateUpgradeUIText } from "@/phaser/utils/helper";
-import { INIT_PLAYER_STATE_LIST, UI } from "@/phaser/constants";
+import { UI } from "@/phaser/constants";
 import { convertSecondsToMinSec } from "@/phaser/utils";
 import { Button } from "@/phaser/ui/upgrade/Button";
-import { UPGRADE } from "@/phaser/constants/upgrade";
+import { UPGRADE, getAttackDamageGradeById } from "@/phaser/constants/upgrade";
 import { AttackerInBunker } from "@/phaser/objects/AttackerInBunker";
+import { EaseText } from "@/phaser/ui/EaseText";
 
 export class InGameUIScene extends Phaser.Scene {
-  upgradeUI: Phaser.GameObjects.Container;
-  buttonElements: Phaser.GameObjects.DOMElement[];
-  stateElement: Phaser.GameObjects.DOMElement;
-
+  uiContainer: Phaser.GameObjects.Container;
   constructor() {
     super("InGameUIScene");
   }
@@ -51,7 +47,9 @@ export class InGameUIScene extends Phaser.Scene {
     const x = this.scale.gameSize.width - 50;
     const InGameScene = this.scene.get("InGameScene") as InGameScene;
     InGameScene.resourceStates = {
-      gold: new ResourceState(this, { x, y: 35, texture: "goldBar" }),
+      gold: new ResourceState(this, { x, y: 35, texture: "goldBar" }).increase(
+        10
+      ),
       star: new ResourceState(this, { x, y: 60, texture: "star" }),
       decreaseByUpgrade({ gold, star }) {
         gold && this.gold.decrease(gold);
@@ -59,12 +57,17 @@ export class InGameUIScene extends Phaser.Scene {
       },
     };
     this.createUI(this);
+    InGameScene.bunker.soldiers
+      .getChildren()
+      .forEach((soldier: AttackerInBunker, index) => {
+        this.addAttackersStateUI(this, soldier, index);
+      });
     this.createTimer(1, () => {
       console.log("game over");
     });
   }
   createUI(scene: Phaser.Scene) {
-    const uiContainer = scene.add.container(
+    this.uiContainer = scene.add.container(
       0,
       Number(scene.scale.gameSize.height) - UI.height
     );
@@ -72,9 +75,9 @@ export class InGameUIScene extends Phaser.Scene {
       .rectangle(0, 0, Number(scene.scale.gameSize.width), UI.height)
       .setOrigin(0, 0)
       .setScrollFactor(0)
-      .setFillStyle(0x00ff00);
+      .setFillStyle(0x00ff00)
+      .setAlpha(0.5);
     // const button = new SelectLevelButton(scene, 100, 100, 1);
-    console.log(Object.entries(UPGRADE));
 
     const buttons = Object.entries(UPGRADE)
       .reverse()
@@ -85,40 +88,84 @@ export class InGameUIScene extends Phaser.Scene {
           width: 50,
           height: 50,
           spriteKey,
-          hoverText: desc,
+          tooltipText: desc,
           enableGrade: true,
           shortcutText,
           onClick: () => {
             const InGameScene = this.scene.get("InGameScene") as InGameScene;
             const { resourceStates } = InGameScene;
-            console.log(id, resourceStates.gold.value, UPGRADE[id].cost);
-
-            if (resourceStates.gold.value < UPGRADE[id].cost) {
+            if (
+              resourceStates.gold.value < UPGRADE[id].cost ||
+              UPGRADE[id].value >= UPGRADE[id].max
+            ) {
+              // TODO: 업그레이드 불가능한 경우 버저를 울린다.
               return;
             }
-            if (UPGRADE[id].value >= UPGRADE[id].max) {
-              return;
-            }
-            console.log(UPGRADE[id].value, UPGRADE[id].max);
-
             resourceStates.decreaseByUpgrade({ gold: UPGRADE[id].cost });
             UPGRADE[id].value += 1;
             // TODO: 실제 업그레이드에 해당하는 로직을 실행, (데미지면 데미지를 진짜 늘려야함)
+            // id 기반으로 분기처리를 하고, 별도 함수로 분리?
             if (id === "addSoldier") {
-              InGameScene.bunker.soldiers.add(
-                new AttackerInBunker(InGameScene, {
-                  owner: InGameScene.bunker,
-                  grade: Phaser.Math.Between(1, 3),
-                })
-              );
+              const grade = Phaser.Math.Between(1, 3);
+              const soldier = new AttackerInBunker(InGameScene, {
+                owner: InGameScene.bunker,
+                grade,
+              });
+              InGameScene.bunker.soldiers.add(soldier);
+              UPGRADE[id].cost += 5;
+              button.setTooltipText(UPGRADE[id].desc);
               InGameScene.bunker.shooterGaugeBar.increase(1);
+              new EaseText(InGameScene, {
+                x: InGameScene.bunker.x - InGameScene.bunker.width,
+                y: InGameScene.bunker.y - InGameScene.bunker.height,
+                text: `+ grade ${grade}`,
+                color: "#ff0000",
+                duration: 3000,
+              });
+              this.addAttackersStateUI(
+                this,
+                soldier,
+                InGameScene.bunker.soldiers.getChildren().length - 1
+              );
             }
+            if (id.startsWith("attackDamage")) {
+              const [gradeStart, gradeEnd] = getAttackDamageGradeById(id);
+              InGameScene.bunker.soldiers
+                .getChildren()
+                .forEach((soldier: AttackerInBunker) => {
+                  if (
+                    soldier.grade >= gradeStart &&
+                    soldier.grade <= gradeEnd
+                  ) {
+                    soldier.damage += soldier.grade;
+                  }
+                });
+            }
+            // TODO: 업그레이드 완료 사운드 재생
             button.emit("upgradeComplete", id);
           },
         }).setName(id);
         return button;
       });
-    uiContainer.add([uiWrap, ...buttons]).setDepth(9999);
+    this.uiContainer.add([uiWrap, ...buttons]).setDepth(9999);
+  }
+  addAttackersStateUI(scene: Phaser.Scene, soldier: AttackerInBunker, index) {
+    const inGameScene = this.scene.get("InGameScene") as InGameScene;
+
+    const button = new Button(scene, {
+      x: 50 * index,
+      y: 0, // TODO: x 좌표가 다 차면 y 좌표를 내려야함
+      width: 50,
+      height: 50,
+      spriteKey: "star",
+      tooltipText: "remove this soldier",
+      enableGrade: false,
+      shortcutText: `${soldier.grade}`,
+      onClick: () => {
+        inGameScene.bunker.soldiers.remove(soldier);
+      },
+    });
+    this.uiContainer.add(button);
   }
   createTimer(min: number, callback: () => void) {
     let remainingTime = min * 60;
@@ -156,110 +203,5 @@ export class InGameUIScene extends Phaser.Scene {
       },
       loop: true,
     });
-  }
-  createUpgradeUI(scene: Phaser.Scene) {
-    this.upgradeUI = scene.add.container(0, 0).setVisible(false);
-
-    this.buttonElements = INIT_PLAYER_STATE_LIST.map(
-      ({ id, spriteKey, shortcutText, desc }, index) => {
-        const element = new Phaser.GameObjects.DOMElement(
-          scene,
-          300,
-          (index + 1) * 50
-        )
-          .setOrigin(0, 0)
-          .createFromCache("upgrade")
-          .addListener("click")
-          .setName(id);
-
-        const inGameScene = this.scene.get("InGameScene") as InGameScene;
-        const gold = inGameScene.bunker.getUpgradeCost(id);
-
-        updateUpgradeUIText(element, {
-          spriteKey,
-          shortcutText,
-          desc,
-          gold,
-        });
-
-        const buttonEl = element.getChildByID("button");
-        const onKeyDown = () => {
-          buttonEl.classList.add("keydown");
-          this.upgrade(id);
-        };
-        const onKeyUp = () => {
-          buttonEl.classList.remove("keydown");
-        };
-        buttonEl.addEventListener("pointerdown", onKeyDown);
-        buttonEl.addEventListener("pointerup", onKeyUp);
-        buttonEl.addEventListener("pointerout", onKeyUp);
-        scene.input.keyboard
-          .addKey(Phaser.Input.Keyboard.KeyCodes[shortcutText])
-          .on("down", onKeyDown)
-          .on("up", onKeyUp);
-        return element;
-      }
-    );
-
-    const uiWrap = scene.add
-      .rectangle(
-        0,
-        0,
-        Number(scene.game.config.width),
-        Number(scene.game.config.height)
-      )
-      .setOrigin(0)
-      .setScrollFactor(0)
-      .setFillStyle(0x000000, 0.7);
-
-    this.createPlayerStateUI(this);
-    this.upgradeUI
-      .add([uiWrap, this.stateElement, ...this.buttonElements])
-      .setDepth(9997);
-  }
-  canUpgrade(id: string) {
-    const inGameScene = this.scene.get("InGameScene") as InGameScene;
-    if (inGameScene.bunker[id] >= getUpgradeMax(id)) {
-      return { canUpgrade: false, cost: { tree: 0, rock: 0, gold: 0 } };
-    }
-    const gold = inGameScene.bunker.getUpgradeCost(id);
-    const { gold: goldState } = inGameScene.resourceStates;
-    return {
-      canUpgrade: goldState.value >= gold,
-      gold,
-    };
-  }
-  upgrade(id: string) {
-    const inGameScene = this.scene.get("InGameScene") as InGameScene;
-    const { canUpgrade, gold } = this.canUpgrade(id);
-    // if (!canUpgrade) {
-    //   return;
-    // }
-    inGameScene.resourceStates.decreaseByUpgrade({ gold });
-    inGameScene.bunker[id] += 1;
-    this.updatePlayerStateUI(id);
-    this.buttonElements.forEach((element) => {
-      const { name } = element;
-      const gold = inGameScene.bunker.getUpgradeCost(name);
-      updateUpgradeUIText(element, {
-        ...INIT_PLAYER_STATE_LIST.find(({ id }) => id === name),
-        gold,
-      });
-    });
-  }
-  createPlayerStateUI(scene: Phaser.Scene) {
-    this.stateElement = new Phaser.GameObjects.DOMElement(scene, 50, 50)
-      .setOrigin(0)
-      .createFromCache("player_state");
-    INIT_PLAYER_STATE_LIST.forEach(({ id }) => {
-      this.updatePlayerStateUI(id);
-      this.stateElement.getChildByID(`${id}-max`).textContent = String(
-        getUpgradeMax(id)
-      );
-    });
-  }
-  updatePlayerStateUI(id: string) {
-    const inGameScene = this.scene.get("InGameScene") as InGameScene;
-    this.stateElement.getChildByID(id).textContent = inGameScene.bunker[id];
   }
 }

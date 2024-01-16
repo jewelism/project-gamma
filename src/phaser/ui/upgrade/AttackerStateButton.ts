@@ -36,5 +36,6 @@ export class AttackerStateButton extends Button {
       enableCountText: true,
       onClick,
     });
+    this.shortcutText.setOrigin(0).setX(5).setY(5);
   }
 }

@@ -1,0 +1,42 @@
+export const UPGRADE = {
+  addSoldier: {
+    value: 1,
+    max: 10,
+    cost: 10,
+    desc: "add new random attacker +1",
+    shortcutText: "A",
+    spriteKey: "sword1",
+  },
+  attackSpeed: {
+    value: 1,
+    max: 10,
+    cost: 10,
+    desc: "increase attack speed 1%",
+    shortcutText: "S",
+    spriteKey: "sword1",
+  },
+  attackDamage: {
+    value: 1,
+    max: 10,
+    cost: 10,
+    desc: "increase attack damage 1%",
+    shortcutText: "D",
+    spriteKey: "defence1",
+  },
+  upgradeBunker: {
+    value: 1,
+    max: 10,
+    cost: 10,
+    desc: "upgrade bunker",
+    shortcutText: "F",
+    spriteKey: "defence1",
+  },
+  income: {
+    value: 1,
+    max: 10,
+    cost: 10,
+    desc: "increase income +0.5%",
+    shortcutText: "G",
+    spriteKey: "book1",
+  },
+};

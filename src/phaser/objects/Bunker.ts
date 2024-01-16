@@ -1,4 +1,5 @@
 import { INIT, UI } from "@/phaser/constants";
+import { UPGRADE } from "@/phaser/constants/upgrade";
 import { AttackerInBunker } from "@/phaser/objects/AttackerInBunker";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { createFlashFn } from "@/phaser/utils/helper";
@@ -22,8 +23,8 @@ export class Bunker extends Phaser.GameObjects.Container {
       -40
     );
     this.shooterGaugeBar = new GaugeBar(this.scene, {
-      max: INIT.soldierCountMax,
-      value: INIT.soldierCount,
+      max: UPGRADE.addSoldier.max,
+      value: UPGRADE.addSoldier.value,
       color: 0x000000,
     }).setPosition(0, 20);
 

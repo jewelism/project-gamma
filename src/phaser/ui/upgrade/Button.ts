@@ -1,4 +1,6 @@
 import { TEXT_STYLE } from "@/phaser/constants";
+import { UPGRADE } from "@/phaser/constants/upgrade";
+import { InGameScene } from "@/phaser/scenes/InGameScene";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { ToolTip } from "@/phaser/ui/ToolTip";
 
@@ -93,6 +95,9 @@ export class Button extends Phaser.GameObjects.Container {
       .addKey(Phaser.Input.Keyboard.KeyCodes[shortcutText])
       .on("down", onKeyDown)
       .on("up", onKeyUp);
+    this.on("upgradeComplete", () => {
+      this.setGrade(Number(this.grade.text) + 1);
+    });
   }
   setGrade(grade: number) {
     this.grade.setText(`${grade}`);

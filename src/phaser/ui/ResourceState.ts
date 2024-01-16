@@ -1,7 +1,7 @@
 import { TEXT_STYLE } from "@/phaser/constants";
 
 export class ResourceState extends Phaser.GameObjects.Container {
-  resourceAmount: number = 0;
+  value: number = 0;
   backgroundColor: Phaser.GameObjects.Rectangle;
   iconImage: Phaser.GameObjects.Image;
   text: Phaser.GameObjects.Text;
@@ -39,12 +39,12 @@ export class ResourceState extends Phaser.GameObjects.Container {
     scene.add.existing(this);
   }
   increase(amount: number) {
-    this.resourceAmount += amount;
-    this.text.setText(String(this.resourceAmount));
+    this.value += amount;
+    this.text.setText(String(this.value));
   }
   decrease(amount: number) {
-    this.resourceAmount -= amount;
-    this.text.setText(String(this.resourceAmount));
+    this.value -= amount;
+    this.text.setText(String(this.value));
   }
   setXAll(x: number) {
     this.setX(x);

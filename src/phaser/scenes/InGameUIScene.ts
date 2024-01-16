@@ -161,11 +161,11 @@ export class InGameUIScene extends Phaser.Scene {
   }
   createAttackersStateButton(scene: Phaser.Scene) {
     const inGameScene = this.scene.get("InGameScene") as InGameScene;
-    const attackerStateButtons = Array.from({ length: 9 }, (_, index) => {
+    const attackerStateButtons = Array.from({ length: 18 }, (_, index) => {
       const grade = index + 1;
       const button = new AttackerStateButton(scene, {
-        x: 50 * index,
-        y: 0, // TODO: x 좌표가 다 차면 y 좌표를 내려야함
+        x: 50 * (index % 9),
+        y: index >= 9 ? 50 : 0,
         width: 50,
         height: 50,
         spriteKey: "star",

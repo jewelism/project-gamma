@@ -77,7 +77,7 @@ export class Button extends Phaser.GameObjects.Container {
       scene,
       button.width - 10,
       button.height - 10,
-      "0",
+      "",
       TEXT_STYLE
     ).setOrigin(0.5, 0.5);
 
@@ -119,8 +119,8 @@ export class Button extends Phaser.GameObjects.Container {
   setTooltipText(text: string) {
     this.tooltip.buttonText.setText(text);
   }
-  setCountText(grade: number) {
-    this.countText.setText(`${grade}`);
+  setCountText(grade: string | number) {
+    this.countText.setText(String(grade));
   }
   increaseCountText(amount: number = 1) {
     this.setCountText(Number(this.countText.text) + amount);

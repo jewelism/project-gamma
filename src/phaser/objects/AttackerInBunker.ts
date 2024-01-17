@@ -41,7 +41,7 @@ export class AttackerInBunker extends Phaser.GameObjects.Zone {
   }
   shootToClosestEnemy() {
     const scene = this.scene as InGameScene;
-    if (scene.enemies?.getChildren().length === 0) {
+    if (!scene || scene.enemies?.getChildren().length === 0) {
       return;
     }
     const closestEnemy = this.scene.physics.closest(

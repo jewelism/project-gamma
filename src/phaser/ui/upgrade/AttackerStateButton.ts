@@ -38,4 +38,15 @@ export class AttackerStateButton extends Button {
     });
     this.shortcutText.setOrigin(0).setX(5).setY(5);
   }
+  decreaseCountText(amount: number = 1) {
+    const current = Number(this.countText.text);
+    if (current <= 0) {
+      return;
+    }
+    const count = current - amount;
+    if (!count) {
+      this.setAlpha(0);
+    }
+    this.setCountText(count ? count : "");
+  }
 }

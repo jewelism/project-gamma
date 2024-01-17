@@ -124,8 +124,8 @@ export class InGameUIScene extends Phaser.Scene {
               button.setTooltipText(UPGRADE[id].desc);
               InGameScene.bunker.shooterGaugeBar.increase(1);
               new EaseText(InGameScene, {
-                x: InGameScene.bunker.x - InGameScene.bunker.width,
-                y: InGameScene.bunker.y - InGameScene.bunker.height,
+                x: InGameScene.bunker.x - 30,
+                y: InGameScene.bunker.y - 50,
                 text: `+ ★${grade}`,
                 color: "#ff0000",
                 duration: 3000,
@@ -156,8 +156,9 @@ export class InGameUIScene extends Phaser.Scene {
   increaseAttackersStateButton(grade: number) {
     const button = this.attackerStateButtonGroup
       .getChildren()
-      .find(({ name }) => name === `grade${grade}`);
-    (button as Button).increaseCountText();
+      .find(({ name }) => name === `grade${grade}`) as AttackerStateButton;
+    button.increaseCountText();
+    button.setAlpha(1);
   }
   createAttackersStateButton(scene: Phaser.Scene) {
     const inGameScene = this.scene.get("InGameScene") as InGameScene;
@@ -175,9 +176,21 @@ export class InGameUIScene extends Phaser.Scene {
           const soldier = inGameScene.bunker.soldiers
             .getChildren()
             .find((sol: AttackerInBunker) => sol.grade === grade);
+          if (!soldier) {
+            return;
+          }
           inGameScene.bunker.soldiers.remove(soldier);
+          soldier.destroy();
+          inGameScene.bunker.shooterGaugeBar.decrease(1);
+          this.attackerStateButtonGroup
+            .getMatching("name", `grade${grade}`)
+            .forEach((button: AttackerStateButton) => {
+              button.decreaseCountText();
+            });
         },
-      }).setName(`grade${grade}`);
+      })
+        .setName(`grade${grade}`)
+        .setAlpha(0);
       this.uiContainer.add(button);
       return button;
     });

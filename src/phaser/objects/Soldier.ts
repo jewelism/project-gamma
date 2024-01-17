@@ -3,7 +3,7 @@ import { Bunker } from "@/phaser/objects/Bunker";
 import { Missile } from "@/phaser/objects/Missile";
 import { InGameScene } from "@/phaser/scenes/InGameScene";
 
-export class AttackerInBunker extends Phaser.GameObjects.Zone {
+export class Soldier extends Phaser.GameObjects.Zone {
   owner: Bunker;
   grade: number;
 

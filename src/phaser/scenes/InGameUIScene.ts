@@ -4,7 +4,7 @@ import { UI } from "@/phaser/constants";
 import { convertSecondsToMinSec } from "@/phaser/utils";
 import { Button } from "@/phaser/ui/upgrade/Button";
 import { UPGRADE, getAttackDamageGradeById } from "@/phaser/constants/upgrade";
-import { AttackerInBunker } from "@/phaser/objects/AttackerInBunker";
+import { Soldier } from "@/phaser/objects/Soldier";
 import { EaseText } from "@/phaser/ui/EaseText";
 import { AttackerStateButton } from "@/phaser/ui/upgrade/AttackerStateButton";
 
@@ -62,7 +62,7 @@ export class InGameUIScene extends Phaser.Scene {
     this.createAttackersStateButton(this);
     Array.from({ length: 2 }).forEach((_) => {
       const initGrade = 1;
-      const soldier = new AttackerInBunker(InGameScene, {
+      const soldier = new Soldier(InGameScene, {
         owner: InGameScene.bunker,
         grade: initGrade,
       });
@@ -116,7 +116,7 @@ export class InGameUIScene extends Phaser.Scene {
             // id 기반으로 분기처리를 하고, 별도 함수로 분리?
             if (id.startsWith("addSoldier")) {
               const grade = Phaser.Math.Between(1, 3);
-              const soldier = new AttackerInBunker(InGameScene, {
+              const soldier = new Soldier(InGameScene, {
                 owner: InGameScene.bunker,
                 grade,
               });
@@ -137,7 +137,7 @@ export class InGameUIScene extends Phaser.Scene {
               const [gradeStart, gradeEnd] = getAttackDamageGradeById(id);
               InGameScene.bunker.soldiers
                 .getChildren()
-                .forEach((soldier: AttackerInBunker) => {
+                .forEach((soldier: Soldier) => {
                   if (
                     soldier.grade >= gradeStart &&
                     soldier.grade <= gradeEnd
@@ -176,7 +176,7 @@ export class InGameUIScene extends Phaser.Scene {
         onClick: () => {
           const soldier = inGameScene.bunker.soldiers
             .getChildren()
-            .find((sol: AttackerInBunker) => sol.grade === grade);
+            .find((sol: Soldier) => sol.grade === grade);
           if (!soldier) {
             return;
           }

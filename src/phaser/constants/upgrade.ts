@@ -1,6 +1,5 @@
-function removeAlphabets(str) {
-  return str.replace(/[a-zA-Z]/g, "");
-}
+import { removeAlphabets } from "@/phaser/utils";
+
 export const getAttackDamageGradeById = (id: string) => {
   return removeAlphabets(id).split("_").map(Number);
 };

@@ -31,6 +31,7 @@ export class Bunker extends Phaser.GameObjects.Container {
     this.add([this.sprite, this.hpBar, this.shooterGaugeBar]);
     scene.physics.add.existing(this, true);
     scene.add.existing(this);
+    (this.body as any).setCircle(30);
   }
   protected preUpdate(_time: number, _delta: number): void {}
   isDestroyed() {

@@ -2,6 +2,11 @@ import { GAME } from "@/phaser/constants";
 import { Bunker } from "@/phaser/objects/Bunker";
 import { Missile } from "@/phaser/objects/Missile";
 import { InGameScene } from "@/phaser/scenes/InGameScene";
+import {
+  getAllEnemyInRange,
+  getRandomEnemyInRange,
+  isOutOfRange,
+} from "@/phaser/utils/helper";
 
 export class Soldier extends Phaser.GameObjects.Zone {
   owner: Bunker;
@@ -31,6 +36,9 @@ export class Soldier extends Phaser.GameObjects.Zone {
     this.drawAttackRange(); // for debug
   }
   preUpdate(_time: number, _delta: number): void {
+    this.shoot();
+  }
+  shoot() {
     if (!(!this.attackTimer && this.owner.hpBar.value > 0)) {
       return;
     }
@@ -38,17 +46,8 @@ export class Soldier extends Phaser.GameObjects.Zone {
     if (!scene || scene.enemies?.getChildren().length === 0) {
       return;
     }
-    const closestEnemy = this.scene.physics.closest(
-      this,
-      scene.enemies.getChildren()
-    );
-    const distance = Phaser.Math.Distance.Between(
-      this.x,
-      this.y,
-      (closestEnemy as any).x,
-      (closestEnemy as any).y
-    );
-    if (distance > this.attackRange) {
+    const target = getRandomEnemyInRange(scene, this);
+    if (!target) {
       return;
     }
     this.createMissile();

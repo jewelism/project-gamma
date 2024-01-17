@@ -1,6 +1,6 @@
 import { Button } from "@/phaser/ui/upgrade/Button";
 
-export class AttackerStateButton extends Button {
+export class SoldierStateButton extends Button {
   button: Button;
 
   constructor(

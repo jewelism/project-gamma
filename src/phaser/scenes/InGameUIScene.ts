@@ -6,7 +6,7 @@ import { Button } from "@/phaser/ui/upgrade/Button";
 import { UPGRADE, getAttackDamageGradeById } from "@/phaser/constants/upgrade";
 import { Soldier } from "@/phaser/objects/Soldier";
 import { EaseText } from "@/phaser/ui/EaseText";
-import { AttackerStateButton } from "@/phaser/ui/upgrade/AttackerStateButton";
+import { SoldierStateButton } from "@/phaser/ui/upgrade/SoldierStateButton";
 
 export class InGameUIScene extends Phaser.Scene {
   uiContainer: Phaser.GameObjects.Container;
@@ -121,7 +121,6 @@ export class InGameUIScene extends Phaser.Scene {
                 grade,
               });
               InGameScene.bunker.soldiers.add(soldier);
-              UPGRADE[id].cost += 5;
               button.setTooltipText(UPGRADE[id].desc);
               InGameScene.bunker.shooterGaugeBar.increase(1);
               new EaseText(InGameScene, {
@@ -157,7 +156,7 @@ export class InGameUIScene extends Phaser.Scene {
   increaseAttackersStateButton(grade: number) {
     const button = this.attackerStateButtonGroup
       .getChildren()
-      .find(({ name }) => name === `grade${grade}`) as AttackerStateButton;
+      .find(({ name }) => name === `grade${grade}`) as SoldierStateButton;
     button.increaseCountText();
     button.setAlpha(1);
   }
@@ -165,7 +164,7 @@ export class InGameUIScene extends Phaser.Scene {
     const inGameScene = this.scene.get("InGameScene") as InGameScene;
     const attackerStateButtons = Array.from({ length: 18 }, (_, index) => {
       const grade = index + 1;
-      const button = new AttackerStateButton(scene, {
+      const button = new SoldierStateButton(scene, {
         x: 50 * (index % 9),
         y: index >= 9 ? 50 : 0,
         width: 50,
@@ -185,7 +184,7 @@ export class InGameUIScene extends Phaser.Scene {
           inGameScene.bunker.shooterGaugeBar.decrease(1);
           this.attackerStateButtonGroup
             .getMatching("name", `grade${grade}`)
-            .forEach((button: AttackerStateButton) => {
+            .forEach((button: SoldierStateButton) => {
               button.decreaseCountText();
             });
         },

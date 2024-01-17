@@ -8,6 +8,7 @@ import { EaseText } from "@/phaser/ui/EaseText";
 import { ResourceState } from "@/phaser/ui/ResourceState";
 
 export class InGameScene extends Phaser.Scene {
+  eventBus: Phaser.Events.EventEmitter;
   bunker: Bunker;
   enemies: Phaser.Physics.Arcade.Group;
   timer: Phaser.Time.TimerEvent;
@@ -20,6 +21,7 @@ export class InGameScene extends Phaser.Scene {
 
   constructor() {
     super("InGameScene");
+    this.eventBus = new Phaser.Events.EventEmitter();
   }
   preload() {
     this.load.tilemapTiledJSON("map", "assets/tiled/map.json");

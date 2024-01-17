@@ -1,6 +1,5 @@
 import { UI } from "@/phaser/constants";
 import { UPGRADE } from "@/phaser/constants/upgrade";
-import { AttackerInBunker } from "@/phaser/objects/AttackerInBunker";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { createFlashFn } from "@/phaser/utils/helper";
 
@@ -9,6 +8,7 @@ export class Bunker extends Phaser.GameObjects.Container {
   shooterGaugeBar: GaugeBar;
   hpBar: GaugeBar;
   soldiers: Phaser.GameObjects.Group;
+  soldierMaxCount = 10;
 
   constructor(scene) {
     super(
@@ -18,16 +18,15 @@ export class Bunker extends Phaser.GameObjects.Container {
     );
 
     this.sprite = new Phaser.Physics.Arcade.Sprite(scene, 0, 0, "bunker");
+    this.soldiers = new Phaser.GameObjects.Group(scene);
     this.hpBar = new GaugeBar(this.scene, {
       max: UPGRADE.upgradeBunker.value * 10,
     }).setPosition(0, -40);
     this.shooterGaugeBar = new GaugeBar(this.scene, {
-      max: UPGRADE.addSoldier.max,
-      value: UPGRADE.addSoldier.value,
+      max: this.soldierMaxCount,
+      value: this.soldiers.getChildren().length,
       color: 0x000000,
     }).setPosition(0, 20);
-
-    this.soldiers = new Phaser.GameObjects.Group(scene);
 
     this.add([this.sprite, this.hpBar, this.shooterGaugeBar]);
     scene.physics.add.existing(this, true);

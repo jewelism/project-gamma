@@ -23,13 +23,20 @@ export class Missile extends Phaser.Physics.Arcade.Sprite {
     this.moveToClosestEnemy();
   }
   moveToClosestEnemy() {
-    if (!this.closestEnemy) {
+    if (!this.closestEnemy || (this.closestEnemy as any).isDestroyed()) {
       this.destroy();
       return;
     }
-    if ((this.closestEnemy as any).isDestroyed()) {
+    if (
+      this.shooter.attackRange <
+      Phaser.Math.Distance.Between(
+        this.x,
+        this.y,
+        (this.closestEnemy as any).x,
+        (this.closestEnemy as any).y
+      )
+    ) {
       this.destroy();
-      this.shooter.shootToClosestEnemy();
       return;
     }
     this.scene.physics.moveToObject(

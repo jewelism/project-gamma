@@ -60,7 +60,7 @@ export class InGameUIScene extends Phaser.Scene {
     };
     this.createUI(this);
     this.createAttackersStateButton(this);
-    Array.from({ length: UPGRADE.addSoldier.value }).forEach((_) => {
+    Array.from({ length: 2 }).forEach((_) => {
       const initGrade = 1;
       const soldier = new AttackerInBunker(InGameScene, {
         owner: InGameScene.bunker,
@@ -68,6 +68,7 @@ export class InGameUIScene extends Phaser.Scene {
       });
       this.increaseAttackersStateButton(initGrade);
       InGameScene.bunker.soldiers.add(soldier);
+      InGameScene.bunker.shooterGaugeBar.increase(1);
     });
 
     this.createTimer(1, () => {
@@ -113,7 +114,7 @@ export class InGameUIScene extends Phaser.Scene {
             UPGRADE[id].value += 1;
             // TODO: 실제 업그레이드에 해당하는 로직을 실행, (데미지면 데미지를 진짜 늘려야함)
             // id 기반으로 분기처리를 하고, 별도 함수로 분리?
-            if (id === "addSoldier") {
+            if (id.startsWith("addSoldier")) {
               const grade = Phaser.Math.Between(1, 3);
               const soldier = new AttackerInBunker(InGameScene, {
                 owner: InGameScene.bunker,

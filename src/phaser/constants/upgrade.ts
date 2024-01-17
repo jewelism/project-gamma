@@ -1,5 +1,8 @@
+function removeAlphabets(str) {
+  return str.replace(/[a-zA-Z]/g, "");
+}
 export const getAttackDamageGradeById = (id: string) => {
-  return id.split("attackDamage")[1].split("_").map(Number);
+  return removeAlphabets(id).split("_").map(Number);
 };
 function createAttackDamage(id: string, shortcutText: string) {
   const [gradeStart, gradeEnd] = getAttackDamageGradeById(id);
@@ -10,28 +13,36 @@ function createAttackDamage(id: string, shortcutText: string) {
       max: 20,
       cost,
       get desc() {
-        return `(${cost}G) increase grade${gradeStart}~${gradeEnd} attack damage + grade`;
+        return `(${cost}G) increase grade${gradeStart}~${gradeEnd} attack damage (+grade★)`;
       },
       shortcutText,
       spriteKey: "sword1",
     },
   };
 }
-
+function createAddSoldier(id: string, shortcutText: string) {
+  const [gradeStart, gradeEnd] = getAttackDamageGradeById(id);
+  const cost = gradeStart * 10;
+  return {
+    [id]: {
+      value: 1,
+      max: 10,
+      cost,
+      get desc() {
+        return `(${cost}G) add ${gradeStart}~${gradeEnd}★ attacker`;
+      },
+      shortcutText,
+      spriteKey: "sword1",
+    },
+  };
+}
 export const UPGRADE = {
   ...createAttackDamage("attackDamage1_3", "Q"),
   ...createAttackDamage("attackDamage4_6", "W"),
   ...createAttackDamage("attackDamage7_9", "E"),
-  addSoldier: {
-    value: 2,
-    max: 10,
-    cost: 5,
-    get desc() {
-      return `(${this.cost}G) add new random attacker +1`;
-    },
-    shortcutText: "A",
-    spriteKey: "sword1",
-  },
+  ...createAddSoldier("addSoldier1_3", "A"),
+  ...createAddSoldier("addSoldier4_6", "S"),
+  ...createAddSoldier("addSoldier7_9", "D"),
   upgradeBunker: {
     value: 1,
     max: 15,
@@ -40,7 +51,7 @@ export const UPGRADE = {
     get desc() {
       return `(${this.cost}G, ${this.time}sec) upgrade bunker +10HP`;
     },
-    shortcutText: "F",
+    shortcutText: "Z",
     spriteKey: "defence1",
   },
   income: {
@@ -51,7 +62,7 @@ export const UPGRADE = {
     get desc() {
       return `(10%, ${this.time}sec) increase income +0.5%`;
     },
-    shortcutText: "G",
+    shortcutText: "X",
     spriteKey: "book1",
   },
   // attackSpeed: {

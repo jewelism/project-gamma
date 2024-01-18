@@ -1,7 +1,7 @@
 import { GAME } from "@/phaser/constants";
 import { Soldier } from "@/phaser/objects/Soldier";
 import { InGameScene } from "@/phaser/scenes/InGameScene";
-import { isOutOfRange } from "@/phaser/utils/helper";
+import { getRandomEnemyInRange, isOutOfRange } from "@/phaser/utils/helper";
 
 export class Missile extends Phaser.Physics.Arcade.Sprite {
   static SPEED = 750;
@@ -20,6 +20,7 @@ export class Missile extends Phaser.Physics.Arcade.Sprite {
       this,
       (this.scene as InGameScene).enemies.getChildren()
     );
+    this.closestEnemy = getRandomEnemyInRange(scene, this.shooter);
     this.setDepth(98);
     (this.scene as InGameScene).bunker.setDepth(99);
   }
@@ -27,15 +28,16 @@ export class Missile extends Phaser.Physics.Arcade.Sprite {
     this.moveToEnemy();
   }
   moveToEnemy() {
-    if (!this.closestEnemy || (this.closestEnemy as any).isDestroyed()) {
-      this.shooter.attackTimer = null;
+    if (!this.closestEnemy) {
+      this.destroy();
+      return;
+    }
+    if ((this.closestEnemy as any).isDestroyed()) {
       this.destroy();
       return;
     }
     if (isOutOfRange(this.shooter, this.closestEnemy)) {
-      this.shooter.attackTimer = null;
       this.destroy();
-      console.log("missile destroy by range");
       return;
     }
     this.scene.physics.moveToObject(

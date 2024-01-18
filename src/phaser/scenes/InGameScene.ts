@@ -40,18 +40,11 @@ export class InGameScene extends Phaser.Scene {
 
     this.bunker = new Bunker(this);
 
-    // this.gaugeBar = new GaugeBar(this, {
-    //   x: this.bunker.x - HealthBarConfig.width / 2,
-    //   y: this.bunker.y + 40,
-    //   max: INIT.soliderCountMax,
-    //   value: INIT.soliderCount,
-    // });
-
     this.enemies = this.physics.add.group();
     this.missiles = this.physics.add.group();
     this.createEnemy();
 
-    this.physics.add.collider(this.enemies, this.missiles, (enemy, missile) => {
+    this.physics.add.overlap(this.enemies, this.missiles, (enemy, missile) => {
       missile.destroy();
       enemy.destroy();
       new EaseText(this, {
@@ -62,7 +55,7 @@ export class InGameScene extends Phaser.Scene {
       });
       this.resourceStates.gold.increase(1);
     });
-    this.physics.add.collider(this.enemies, this.bunker, (_bunker, enemy) => {
+    this.physics.add.overlap(this.enemies, this.bunker, (_bunker, enemy) => {
       enemy.destroy();
       this.bunker.decreaseHealth(1);
 
@@ -103,7 +96,7 @@ export class InGameScene extends Phaser.Scene {
     let count = 0;
 
     this.timer = this.time.addEvent({
-      delay: 1000 / GAME.speed,
+      delay: 200 / GAME.speed,
       callback: () => {
         if (this.bunker.hpBar.value === 0) {
           return;

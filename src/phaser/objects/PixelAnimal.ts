@@ -1,7 +1,10 @@
+import { InGameScene } from "@/phaser/scenes/InGameScene";
+
 export class PixelAnimal extends Phaser.Physics.Arcade.Sprite {
-  moveSpeed: number = 150;
+  moveSpeed: number = 50;
   frameNo: number;
   hp: number;
+  attackRange: number = 100;
 
   constructor(scene, { x, y, hp, frameNo }) {
     super(scene, x, y, "pixel_animals", frameNo);
@@ -29,7 +32,18 @@ export class PixelAnimal extends Phaser.Physics.Arcade.Sprite {
     return !this.active;
   }
   moveToBunker() {
-    if (!(this.scene as any).bunker.scene) {
+    const { bunker } = this.scene as InGameScene;
+    if (!bunker.scene) {
+      this.setVelocity(0, 0);
+      return;
+    }
+    const distance = Phaser.Math.Distance.Between(
+      bunker.x,
+      bunker.y,
+      this.x,
+      this.y
+    );
+    if (distance <= this.attackRange) {
       this.setVelocity(0, 0);
       return;
     }

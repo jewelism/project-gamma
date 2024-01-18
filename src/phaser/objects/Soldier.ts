@@ -2,11 +2,7 @@ import { GAME } from "@/phaser/constants";
 import { Bunker } from "@/phaser/objects/Bunker";
 import { Missile } from "@/phaser/objects/Missile";
 import { InGameScene } from "@/phaser/scenes/InGameScene";
-import {
-  getAllEnemyInRange,
-  getRandomEnemyInRange,
-  isOutOfRange,
-} from "@/phaser/utils/helper";
+import { getRandomEnemyInRange } from "@/phaser/utils/helper";
 
 export class Soldier extends Phaser.GameObjects.Zone {
   owner: Bunker;
@@ -54,7 +50,6 @@ export class Soldier extends Phaser.GameObjects.Zone {
     this.attackTimer = this.scene.time.delayedCall(
       this.attackSpeed / GAME.speed,
       () => {
-        this.createMissile();
         this.attackTimer = null;
       }
     );

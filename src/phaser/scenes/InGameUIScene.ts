@@ -3,7 +3,7 @@ import { ResourceState } from "@/phaser/ui/ResourceState";
 import { UI } from "@/phaser/constants";
 import { convertSecondsToMinSec } from "@/phaser/utils";
 import { Button } from "@/phaser/ui/upgrade/Button";
-import { UPGRADE, getAttackDamageGradeById } from "@/phaser/constants/upgrade";
+import { UPGRADE, getSoldierGradeById } from "@/phaser/constants/upgrade";
 import { Soldier } from "@/phaser/objects/Soldier";
 import { EaseText } from "@/phaser/ui/EaseText";
 import { SoldierStateButton } from "@/phaser/ui/upgrade/SoldierStateButton";
@@ -60,7 +60,7 @@ export class InGameUIScene extends Phaser.Scene {
     };
     this.createUI(this);
     this.createAttackersStateButton(this);
-    Array.from({ length: 2 }).forEach((_) => {
+    Array.from({ length: 1 }).forEach((_) => {
       const initGrade = 1;
       const soldier = new Soldier(InGameScene, {
         owner: InGameScene.bunker,
@@ -88,12 +88,12 @@ export class InGameUIScene extends Phaser.Scene {
       .setAlpha(0.5);
     // const button = new SelectLevelButton(scene, 100, 100, 1);
 
-    const buttons = Object.entries(UPGRADE)
-      .reverse()
-      .map(([id, { spriteKey, desc, shortcutText }], index) => {
+    const mapUpgradeButton =
+      (line = 0) =>
+      ([id, { spriteKey, desc, shortcutText }], index) => {
         const button = new Button(scene, {
           x: Number(scene.game.config.width) - 50 * (index + 1),
-          y: 0,
+          y: line * 50,
           width: 50,
           height: 50,
           spriteKey,
@@ -110,12 +110,17 @@ export class InGameUIScene extends Phaser.Scene {
               // TODO: 업그레이드 불가능한 경우 버저를 울린다.
               return;
             }
-            resourceStates.decreaseByUpgrade({ gold: UPGRADE[id].cost });
-            UPGRADE[id].value += 1;
             // TODO: 실제 업그레이드에 해당하는 로직을 실행, (데미지면 데미지를 진짜 늘려야함)
             // id 기반으로 분기처리를 하고, 별도 함수로 분리?
             if (id.startsWith("addSoldier")) {
-              const grade = Phaser.Math.Between(1, 3);
+              if (
+                InGameScene.bunker.soldiers.getChildren().length >=
+                InGameScene.bunker.soldierMaxCount
+              ) {
+                return;
+              }
+              const [gradeStart, gradeEnd] = getSoldierGradeById(id);
+              const grade = Phaser.Math.Between(gradeStart, gradeEnd);
               const soldier = new Soldier(InGameScene, {
                 owner: InGameScene.bunker,
                 grade,
@@ -133,7 +138,7 @@ export class InGameUIScene extends Phaser.Scene {
               this.increaseAttackersStateButton(grade);
             }
             if (id.startsWith("attackDamage")) {
-              const [gradeStart, gradeEnd] = getAttackDamageGradeById(id);
+              const [gradeStart, gradeEnd] = getSoldierGradeById(id);
               InGameScene.bunker.soldiers
                 .getChildren()
                 .forEach((soldier: Soldier) => {
@@ -147,10 +152,19 @@ export class InGameUIScene extends Phaser.Scene {
             }
             // TODO: 업그레이드 완료 사운드 재생
             button.emit("upgradeComplete", id);
+            resourceStates.decreaseByUpgrade({ gold: UPGRADE[id].cost });
+            UPGRADE[id].value += 1;
           },
         }).setName(id);
         return button;
-      });
+      };
+    const upButtons = Object.entries(UPGRADE);
+
+    const buttons = [
+      ...upButtons.slice(0, 3).map(mapUpgradeButton()),
+      ...upButtons.slice(3, 6).map(mapUpgradeButton(1)),
+      ...upButtons.slice(6).map(mapUpgradeButton(2)),
+    ];
     this.uiContainer.add([uiWrap, ...buttons]).setDepth(9999);
   }
   increaseAttackersStateButton(grade: number) {
@@ -162,11 +176,12 @@ export class InGameUIScene extends Phaser.Scene {
   }
   createAttackersStateButton(scene: Phaser.Scene) {
     const inGameScene = this.scene.get("InGameScene") as InGameScene;
-    const attackerStateButtons = Array.from({ length: 18 }, (_, index) => {
+    const length = 18;
+    const attackerStateButtons = Array.from({ length }, (_, index) => {
       const grade = index + 1;
       const button = new SoldierStateButton(scene, {
-        x: 50 * (index % 9),
-        y: index >= 9 ? 50 : 0,
+        x: 50 * (index % (length / 3)),
+        y: index >= length / 3 ? (index >= 12 ? 100 : 50) : 0,
         width: 50,
         height: 50,
         spriteKey: "star",

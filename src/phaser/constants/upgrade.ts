@@ -1,10 +1,10 @@
 import { removeAlphabets } from "@/phaser/utils";
 
-export const getAttackDamageGradeById = (id: string) => {
+export const getSoldierGradeById = (id: string): number[] => {
   return removeAlphabets(id).split("_").map(Number);
 };
 function createAttackDamage(id: string, shortcutText: string) {
-  const [gradeStart, gradeEnd] = getAttackDamageGradeById(id);
+  const [gradeStart, gradeEnd] = getSoldierGradeById(id);
   const cost = gradeStart * 10;
   return {
     [id]: {
@@ -20,7 +20,7 @@ function createAttackDamage(id: string, shortcutText: string) {
   };
 }
 function createAddSoldier(id: string, shortcutText: string) {
-  const [gradeStart, gradeEnd] = getAttackDamageGradeById(id);
+  const [gradeStart, gradeEnd] = getSoldierGradeById(id);
   const cost = gradeStart * 10;
   return {
     [id]: {
@@ -36,23 +36,12 @@ function createAddSoldier(id: string, shortcutText: string) {
   };
 }
 export const UPGRADE = {
-  ...createAttackDamage("attackDamage1_3", "Q"),
-  ...createAttackDamage("attackDamage4_6", "W"),
-  ...createAttackDamage("attackDamage7_9", "E"),
-  ...createAddSoldier("addSoldier1_3", "A"),
-  ...createAddSoldier("addSoldier4_6", "S"),
-  ...createAddSoldier("addSoldier7_9", "D"),
-  upgradeBunker: {
-    value: 1,
-    max: 15,
-    cost: 100,
-    time: 120,
-    get desc() {
-      return `(${this.cost}G, ${this.time}sec) upgrade bunker +10HP`;
-    },
-    shortcutText: "Z",
-    spriteKey: "defence1",
-  },
+  ...createAddSoldier("addSoldier7_9", "E"),
+  ...createAddSoldier("addSoldier4_6", "W"),
+  ...createAddSoldier("addSoldier1_3", "Q"),
+  ...createAttackDamage("attackDamage7_9", "D"),
+  ...createAttackDamage("attackDamage4_6", "S"),
+  ...createAttackDamage("attackDamage1_3", "A"),
   income: {
     value: 1,
     max: 10,
@@ -63,6 +52,17 @@ export const UPGRADE = {
     },
     shortcutText: "X",
     spriteKey: "book1",
+  },
+  upgradeBunker: {
+    value: 1,
+    max: 15,
+    cost: 100,
+    time: 120,
+    get desc() {
+      return `(${this.cost}G, ${this.time}sec) upgrade bunker +10HP`;
+    },
+    shortcutText: "Z",
+    spriteKey: "defence1",
   },
   // attackSpeed: {
   //   value: 1,

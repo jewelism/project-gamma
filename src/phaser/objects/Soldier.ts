@@ -25,7 +25,7 @@ export class Soldier extends Phaser.GameObjects.Zone {
 
     this.damage = 1 * this.grade;
     this.attackRange = 100 + this.grade * 10;
-    this.attackSpeed = 1000 - this.grade * 100;
+    this.attackSpeed = 2000 - this.grade * 100;
 
     scene.add.existing(this);
 

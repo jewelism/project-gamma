@@ -1,5 +1,4 @@
 import { InGameScene } from "@/phaser/scenes/InGameScene";
-import { EaseText } from "@/phaser/ui/EaseText";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { createFlashFn, isOutOfRange } from "@/phaser/utils/helper";
 
@@ -36,9 +35,12 @@ export class Enemy extends Phaser.GameObjects.Container {
     this.frameNo = frameNo;
     this.spriteKey = spriteKey;
 
-    this.setSize(this.sprite.width, this.sprite.height);
+    this.setSize(this.sprite.width + 5, this.sprite.height + 5);
 
-    this.hpBar = new GaugeBar(scene, { max: this.maxHp });
+    this.hpBar = new GaugeBar(scene, {
+      max: this.maxHp,
+      width: 25,
+    }).setPosition(0, -30);
     this.sprite.anims.create({
       key: `${spriteKey}_move${frameNo}`,
       frames: this.sprite.anims.generateFrameNames(spriteKey, {

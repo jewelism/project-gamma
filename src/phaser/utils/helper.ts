@@ -39,3 +39,22 @@ export const getRandomEnemyInRange = (scene, soldier: Soldier) => {
   }
   return target;
 };
+
+export const getEnemyRandomDirectionXY = (scene: Phaser.Scene) => {
+  const direction = Phaser.Math.RND.integerInRange(0, 3);
+  let x: number, y: number;
+  if (direction === 0) {
+    x = Phaser.Math.RND.integerInRange(0, scene.cameras.main.worldView.right);
+    y = scene.cameras.main.worldView.top - 50;
+  } else if (direction === 1) {
+    x = scene.cameras.main.worldView.right + 50;
+    y = Phaser.Math.RND.integerInRange(0, scene.cameras.main.worldView.bottom);
+  } else if (direction === 2) {
+    x = Phaser.Math.RND.integerInRange(0, scene.cameras.main.worldView.right);
+    y = scene.cameras.main.worldView.bottom + 50;
+  } else if (direction === 3) {
+    x = scene.cameras.main.worldView.left - 50;
+    y = Phaser.Math.RND.integerInRange(0, scene.cameras.main.worldView.bottom);
+  }
+  return [x, y];
+};

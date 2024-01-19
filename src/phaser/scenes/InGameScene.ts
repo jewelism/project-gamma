@@ -8,6 +8,7 @@ import { PixelAnimal } from "@/phaser/objects/PixelAnimal";
 import { createTitleText } from "@/phaser/phaserUtils/titleText";
 import { EaseText } from "@/phaser/ui/EaseText";
 import { ResourceState } from "@/phaser/ui/ResourceState";
+import { getEnemyRandomDirectionXY } from "@/phaser/utils/helper";
 
 export class InGameScene extends Phaser.Scene {
   eventBus: Phaser.Events.EventEmitter;
@@ -68,7 +69,7 @@ export class InGameScene extends Phaser.Scene {
       enemy.destroy();
       this.bunker.decreaseHealth(1);
 
-      if (this.bunker.hpBar.value === 0) {
+      if (this.bunker.isDestroyed()) {
         this.bunker.setAlpha(0.1);
 
         createTitleText(this, "Game Over", Number(this.game.config.height) / 2);
@@ -79,7 +80,6 @@ export class InGameScene extends Phaser.Scene {
           this.input.keyboard.on("keydown", onKeydown);
           this.input.on("pointerdown", onKeydown);
         });
-        // overlay game over
         // this.scene.start("StartScene");
         return;
       }
@@ -105,56 +105,30 @@ export class InGameScene extends Phaser.Scene {
     let count = 0;
 
     this.timer = this.time.addEvent({
-      delay: 1000 / GAME.speed,
+      delay: 900 / GAME.speed,
       callback: () => {
+        if (index >= phaseData.length) {
+          return;
+        }
         if (this.bunker.hpBar.value === 0) {
           return;
         }
         const { phase, hp, spriteKey, frameNo } = phaseData[index];
-        const direction = Phaser.Math.RND.integerInRange(0, 3);
-        let x, y;
-        if (direction === 0) {
-          x = Phaser.Math.RND.integerInRange(
-            0,
-            this.cameras.main.worldView.right
-          );
-          y = this.cameras.main.worldView.top - 50;
-        } else if (direction === 1) {
-          x = this.cameras.main.worldView.right + 50;
-          y = Phaser.Math.RND.integerInRange(
-            0,
-            this.cameras.main.worldView.bottom
-          );
-        } else if (direction === 2) {
-          x = Phaser.Math.RND.integerInRange(
-            0,
-            this.cameras.main.worldView.right
-          );
-          y = this.cameras.main.worldView.bottom + 50;
-        } else if (direction === 3) {
-          x = this.cameras.main.worldView.left - 50;
-          y = Phaser.Math.RND.integerInRange(
-            0,
-            this.cameras.main.worldView.bottom
-          );
-        }
+        const [x, y] = getEnemyRandomDirectionXY(this);
         const enemy = new Enemy(this, {
           x,
           y,
           grade: phase,
           hp,
-          spriteKey: "pixel_animals",
+          spriteKey,
           frameNo,
         });
-        // const pixelAnimal = new PixelAnimal(this, {
-        //   x,
-        //   y,
-        //   hp,
-        //   frameNo,
-        // });
         this.enemies.add(enemy);
-        // this.enemies.add(pixelAnimal);
         count++;
+        if (count === phaseData[index].count) {
+          index++;
+          count = 0;
+        }
       },
       loop: true,
       callbackScope: this,

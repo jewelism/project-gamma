@@ -2,6 +2,8 @@
 import { GAME } from "@/phaser/constants";
 import { getPhaseData } from "@/phaser/constants/phase";
 import { Bunker } from "@/phaser/objects/Bunker";
+import { Enemy } from "@/phaser/objects/Enemy";
+import { Missile } from "@/phaser/objects/Missile";
 import { PixelAnimal } from "@/phaser/objects/PixelAnimal";
 import { createTitleText } from "@/phaser/phaserUtils/titleText";
 import { EaseText } from "@/phaser/ui/EaseText";
@@ -44,17 +46,24 @@ export class InGameScene extends Phaser.Scene {
     this.missiles = this.physics.add.group();
     this.createEnemy();
 
-    this.physics.add.overlap(this.enemies, this.missiles, (enemy, missile) => {
-      missile.destroy();
-      enemy.destroy();
-      new EaseText(this, {
-        x: (enemy as any).x,
-        y: (enemy as any).y,
-        text: "+1",
-        color: "#84b4c8",
-      });
-      this.resourceStates.gold.increase(1);
-    });
+    this.physics.add.overlap(
+      this.enemies,
+      this.missiles,
+      (_enemy, _missile) => {
+        const enemy = _enemy as Enemy;
+        const missile = _missile as Missile;
+        missile.destroy();
+        enemy.decreaseHp(missile.shooter.damage, () => {
+          new EaseText(this, {
+            x: (enemy as any).x,
+            y: (enemy as any).y,
+            text: "+1",
+            color: "#619196",
+          });
+          this.resourceStates.gold.increase(1);
+        });
+      }
+    );
     this.physics.add.overlap(this.enemies, this.bunker, (_bunker, enemy) => {
       enemy.destroy();
       this.bunker.decreaseHealth(1);
@@ -129,14 +138,22 @@ export class InGameScene extends Phaser.Scene {
             this.cameras.main.worldView.bottom
           );
         }
-
-        const pixelAnimal = new PixelAnimal(this, {
+        const enemy = new Enemy(this, {
           x,
           y,
+          grade: phase,
           hp,
+          spriteKey: "pixel_animals",
           frameNo,
         });
-        this.enemies.add(pixelAnimal);
+        // const pixelAnimal = new PixelAnimal(this, {
+        //   x,
+        //   y,
+        //   hp,
+        //   frameNo,
+        // });
+        this.enemies.add(enemy);
+        // this.enemies.add(pixelAnimal);
         count++;
       },
       loop: true,

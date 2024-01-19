@@ -42,6 +42,15 @@ export const UPGRADE = {
   ...createAttackDamage("attackDamage7_9", "D"),
   ...createAttackDamage("attackDamage4_6", "S"),
   ...createAttackDamage("attackDamage1_3", "A"),
+  summonBoss: {
+    value: 1,
+    max: 15,
+    get desc() {
+      return `summon boss`;
+    },
+    shortcutText: "C",
+    spriteKey: "defence1",
+  },
   income: {
     value: 1,
     max: 10,

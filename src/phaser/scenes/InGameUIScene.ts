@@ -202,6 +202,7 @@ export class InGameUIScene extends Phaser.Scene {
             .forEach((button: SoldierStateButton) => {
               button.decreaseCountText();
             });
+          inGameScene.resourceStates.gold.increase(grade * 5);
         },
       })
         .setName(`grade${grade}`)

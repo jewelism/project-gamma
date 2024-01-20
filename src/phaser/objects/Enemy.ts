@@ -119,6 +119,9 @@ export class Enemy extends Phaser.GameObjects.Container {
     if (!scene || scene.bunker.isDestroyed()) {
       return;
     }
+    if (isOutOfRange(this, scene.bunker)) {
+      return;
+    }
     this.createMissile();
     this.attackTimer = this.scene.time.delayedCall(
       this.attackSpeed / GAME.speed,
@@ -187,10 +190,6 @@ export class EnemyMissile extends Phaser.Physics.Arcade.Sprite {
       return;
     }
     if (this.target.isDestroyed()) {
-      this.destroy();
-      return;
-    }
-    if (isOutOfRange(this.shooter, this.target)) {
       this.destroy();
       return;
     }

@@ -60,20 +60,10 @@ export class InGameUIScene extends Phaser.Scene {
     };
     this.createUI(this);
     this.createAttackersStateButton(this);
-    // Array.from({ length: 1 }).forEach((_) => {
-    //   const initGrade = 1;
-    //   const soldier = new Soldier(InGameScene, {
-    //     owner: InGameScene.bunker,
-    //     grade: initGrade,
-    //   });
-    //   this.increaseAttackersStateButton(initGrade);
-    //   InGameScene.bunker.soldiers.add(soldier);
-    //   InGameScene.bunker.shooterGaugeBar.increase(1);
-    // });
 
-    this.createTimer(1, () => {
-      console.log("game over");
-    });
+    // this.createTimer(1, () => {
+    //   console.log("game over");
+    // });
   }
   createUI(scene: Phaser.Scene) {
     this.uiContainer = scene.add.container(

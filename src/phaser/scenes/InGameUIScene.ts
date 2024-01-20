@@ -50,7 +50,7 @@ export class InGameUIScene extends Phaser.Scene {
     const InGameScene = this.scene.get("InGameScene") as InGameScene;
     InGameScene.resourceStates = {
       gold: new ResourceState(this, { x, y: 35, texture: "goldBar" }).increase(
-        10
+        60
       ),
       star: new ResourceState(this, { x, y: 60, texture: "star" }),
       decreaseByUpgrade({ gold, star }) {
@@ -60,16 +60,16 @@ export class InGameUIScene extends Phaser.Scene {
     };
     this.createUI(this);
     this.createAttackersStateButton(this);
-    Array.from({ length: 1 }).forEach((_) => {
-      const initGrade = 1;
-      const soldier = new Soldier(InGameScene, {
-        owner: InGameScene.bunker,
-        grade: initGrade,
-      });
-      this.increaseAttackersStateButton(initGrade);
-      InGameScene.bunker.soldiers.add(soldier);
-      InGameScene.bunker.shooterGaugeBar.increase(1);
-    });
+    // Array.from({ length: 1 }).forEach((_) => {
+    //   const initGrade = 1;
+    //   const soldier = new Soldier(InGameScene, {
+    //     owner: InGameScene.bunker,
+    //     grade: initGrade,
+    //   });
+    //   this.increaseAttackersStateButton(initGrade);
+    //   InGameScene.bunker.soldiers.add(soldier);
+    //   InGameScene.bunker.shooterGaugeBar.increase(1);
+    // });
 
     this.createTimer(1, () => {
       console.log("game over");
@@ -131,7 +131,7 @@ export class InGameUIScene extends Phaser.Scene {
               new EaseText(InGameScene, {
                 x: InGameScene.bunker.x - 30,
                 y: InGameScene.bunker.y - 50,
-                text: `+ ★${grade}`,
+                text: `+★${grade}`,
                 color: "#ff0000",
                 duration: 3000,
               }).setFontSize(20);
@@ -179,13 +179,14 @@ export class InGameUIScene extends Phaser.Scene {
     const length = 18;
     const attackerStateButtons = Array.from({ length }, (_, index) => {
       const grade = index + 1;
+      const price = grade * 5;
       const button = new SoldierStateButton(scene, {
         x: 50 * (index % (length / 3)),
         y: index >= length / 3 ? (index >= 12 ? 100 : 50) : 0,
         width: 50,
         height: 50,
         spriteKey: "star",
-        tooltipText: "remove this soldier",
+        tooltipText: `sell ★${grade} (${price}G)`,
         gradeText: `★${grade}`,
         onClick: () => {
           const soldier = inGameScene.bunker.soldiers
@@ -202,7 +203,7 @@ export class InGameUIScene extends Phaser.Scene {
             .forEach((button: SoldierStateButton) => {
               button.decreaseCountText();
             });
-          inGameScene.resourceStates.gold.increase(grade * 5);
+          inGameScene.resourceStates.gold.increase(price);
         },
       })
         .setName(`grade${grade}`)

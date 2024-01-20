@@ -12,6 +12,8 @@ export class Missile extends Phaser.Physics.Arcade.Sprite {
     super(scene, shooter.x, shooter.y, "missile");
 
     this.shooter = shooter;
+    this.x = shooter.x;
+    this.y = shooter.y;
 
     scene.add.existing(this);
     scene.physics.world.enableBody(this);

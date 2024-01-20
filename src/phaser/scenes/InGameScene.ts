@@ -4,8 +4,6 @@ import { getPhaseData } from "@/phaser/constants/phase";
 import { Bunker } from "@/phaser/objects/Bunker";
 import { Enemy } from "@/phaser/objects/Enemy";
 import { Missile } from "@/phaser/objects/Missile";
-import { PixelAnimal } from "@/phaser/objects/PixelAnimal";
-import { createTitleText } from "@/phaser/phaserUtils/titleText";
 import { EaseText } from "@/phaser/ui/EaseText";
 import { ResourceState } from "@/phaser/ui/ResourceState";
 import { getEnemyRandomDirectionXY } from "@/phaser/utils/helper";
@@ -65,32 +63,6 @@ export class InGameScene extends Phaser.Scene {
         });
       }
     );
-    this.physics.add.overlap(this.enemies, this.bunker, (_bunker, enemy) => {
-      enemy.destroy();
-      this.bunker.decreaseHealth(1);
-
-      if (this.bunker.isDestroyed()) {
-        this.bunker.setAlpha(0.1);
-
-        createTitleText(this, "Game Over", Number(this.game.config.height) / 2);
-        this.time.delayedCall(300, () => {
-          const onKeydown = () => {
-            this.scene.start("StartScene");
-          };
-          this.input.keyboard.on("keydown", onKeydown);
-          this.input.on("pointerdown", onKeydown);
-        });
-        // this.scene.start("StartScene");
-        return;
-      }
-
-      new EaseText(this, {
-        x: (enemy as any).x,
-        y: (enemy as any).y,
-        text: "boom!",
-        color: "#ff0000",
-      });
-    });
   }
   createMap(scene: Phaser.Scene) {
     const map = scene.make.tilemap({
@@ -119,7 +91,6 @@ export class InGameScene extends Phaser.Scene {
           x,
           y,
           grade: phase,
-          hp,
           spriteKey,
           frameNo,
         });

@@ -57,11 +57,9 @@ export class Soldier extends Phaser.GameObjects.Zone {
   createMissile() {
     const scene = this.scene as InGameScene;
 
-    const missile = new Missile(this.scene, {
+    const missile = new Missile(scene, {
       shooter: this,
-    })
-      .setX(this.x)
-      .setY(this.y);
+    });
     scene.missiles.add(missile);
   }
   drawAttackRange() {

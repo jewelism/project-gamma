@@ -12,7 +12,7 @@ function createAttackDamage(id: string, shortcutText: string) {
       max: 20,
       cost,
       get desc() {
-        return `(${cost}G) increase grade${gradeStart}~${gradeEnd} attack damage (+grade★)`;
+        return `(${cost}G) ★${gradeStart}~★${gradeEnd} attack damage (+grade★)`;
       },
       shortcutText,
       spriteKey: "sword1",
@@ -21,14 +21,13 @@ function createAttackDamage(id: string, shortcutText: string) {
 }
 function createAddSoldier(id: string, shortcutText: string) {
   const [gradeStart, gradeEnd] = getSoldierGradeById(id);
-  const cost = gradeStart * 10;
+  const cost = gradeStart * 20;
   return {
     [id]: {
       value: 1,
-      max: 10,
       cost,
       get desc() {
-        return `(${cost}G) add ${gradeStart}~${gradeEnd}★ attacker`;
+        return `(${cost}G) add ★${gradeStart}~★${gradeEnd}`;
       },
       shortcutText,
       spriteKey: "sword1",
@@ -36,9 +35,9 @@ function createAddSoldier(id: string, shortcutText: string) {
   };
 }
 export const UPGRADE = {
-  ...createAddSoldier("addSoldier7_9", "E"),
-  ...createAddSoldier("addSoldier4_6", "W"),
-  ...createAddSoldier("addSoldier1_3", "Q"),
+  ...createAddSoldier("addSoldier13_18", "E"),
+  ...createAddSoldier("addSoldier7_12", "W"),
+  ...createAddSoldier("addSoldier1_6", "Q"),
   ...createAttackDamage("attackDamage7_9", "D"),
   ...createAttackDamage("attackDamage4_6", "S"),
   ...createAttackDamage("attackDamage1_3", "A"),

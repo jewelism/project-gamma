@@ -11,8 +11,11 @@ import { SoldierStateButton } from "@/phaser/ui/upgrade/SoldierStateButton";
 export class InGameUIScene extends Phaser.Scene {
   uiContainer: Phaser.GameObjects.Container;
   attackerStateButtonGroup: Phaser.GameObjects.Group;
+  uiEventBus: Phaser.Events.EventEmitter;
+
   constructor() {
     super("InGameUIScene");
+    this.uiEventBus = new Phaser.Events.EventEmitter();
   }
   preload() {
     this.load.spritesheet("sword1", "assets/ui/upgrade_icon32x32.png", {
@@ -77,10 +80,21 @@ export class InGameUIScene extends Phaser.Scene {
       .setFillStyle(0x00ff00)
       .setAlpha(0.5);
     // const button = new SelectLevelButton(scene, 100, 100, 1);
-
+    this.uiEventBus.on(`upgradeComplete`, (id: string) => {
+      console.log("upgradeComplete", id);
+      if (id.startsWith("attackDamage")) {
+        UPGRADE[id].value += 1;
+      }
+      const InGameScene = this.scene.get("InGameScene") as InGameScene;
+      const { resourceStates } = InGameScene;
+      resourceStates.decreaseByUpgrade({
+        gold:
+          id === "income" ? resourceStates.gold.value / 10 : UPGRADE[id].cost,
+      });
+    });
     const mapUpgradeButton =
       (line = 0) =>
-      ([id, { spriteKey, desc, shortcutText }], index) => {
+      ([id, { spriteKey, desc, shortcutText, ...rest }], index) => {
         const button = new Button(scene, {
           x: Number(scene.game.config.width) - 50 * (index + 1),
           y: line * 50,
@@ -89,10 +103,12 @@ export class InGameUIScene extends Phaser.Scene {
           spriteKey,
           tooltipText: desc,
           enableCountText: true,
+          progressTime: rest?.time,
           shortcutText,
-          onClick: () => {
+          onClick: (fn) => {
             const InGameScene = this.scene.get("InGameScene") as InGameScene;
             const { resourceStates } = InGameScene;
+
             if (
               resourceStates.gold.value < UPGRADE[id].cost ||
               UPGRADE[id].value >= UPGRADE[id].max
@@ -139,11 +155,10 @@ export class InGameUIScene extends Phaser.Scene {
                     soldier.damage += soldier.grade;
                   }
                 });
+              button.increaseCountText();
             }
             // TODO: 업그레이드 완료 사운드 재생
-            button.emit("upgradeComplete", id);
-            resourceStates.decreaseByUpgrade({ gold: UPGRADE[id].cost });
-            UPGRADE[id].value += 1;
+            fn();
           },
         }).setName(id);
         return button;

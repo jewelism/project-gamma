@@ -1,4 +1,5 @@
 import { TEXT_STYLE } from "@/phaser/constants";
+import { InGameUIScene } from "@/phaser/scenes/InGameUIScene";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { ToolTip } from "@/phaser/ui/ToolTip";
 
@@ -19,7 +20,7 @@ export class Button extends Phaser.GameObjects.Container {
       tooltipText,
       shortcutText,
       enableCountText = false,
-      progressTime,
+      progressTime = 0,
       onClick,
     }: {
       x: number;
@@ -31,7 +32,7 @@ export class Button extends Phaser.GameObjects.Container {
       shortcutText?: string;
       enableCountText?: boolean;
       progressTime?: number;
-      onClick?: () => void;
+      onClick?: (fn: () => void) => void;
     }
   ) {
     super(scene, x, y);
@@ -41,9 +42,20 @@ export class Button extends Phaser.GameObjects.Container {
       if (!onClick) {
         return;
       }
-      button.setAlpha(0.4);
-      icon.setAlpha(0.4);
-      onClick();
+      onClick(() => {
+        button.setAlpha(0.4);
+        icon.setAlpha(0.4);
+        if (progressTime) {
+          this.setProgressTime(progressTime);
+          this.add(this.progress);
+          console.log("progressTime", progressTime);
+        } else {
+          (scene as InGameUIScene).uiEventBus.emit(
+            `upgradeComplete`,
+            this.name
+          );
+        }
+      });
     };
     const onKeyUp = () => {
       button.setAlpha(1);
@@ -91,11 +103,11 @@ export class Button extends Phaser.GameObjects.Container {
         width: button.width,
         height: 5,
         color: 0x00ffff,
-      })
-        .setPosition(button.width / 2, button.height)
-        .setAlpha(0);
-      this.setProgressTime(progressTime);
-      this.add(this.progress);
+      }).setPosition(button.width / 2, button.height - 10);
+      console.log("progressTime2", progressTime);
+
+      // this.setProgressTime(progressTime);
+      // this.add(this.progress);
     }
 
     if (shortcutText) {
@@ -112,9 +124,6 @@ export class Button extends Phaser.GameObjects.Container {
         .on("down", onKeyDown)
         .on("up", onKeyUp);
     }
-    this.on("upgradeComplete", () => {
-      this.increaseCountText();
-    });
   }
   setTooltipText(text: string) {
     this.tooltip.buttonText.setText(text);
@@ -134,8 +143,8 @@ export class Button extends Phaser.GameObjects.Container {
         this.progress.increase(1);
         if (this.progress.value >= this.progress.max) {
           timerEvent.remove();
-          this.progress.setAlpha(0);
-          this.emit(`upgrade_${this.name}`);
+          this.remove(this.progress);
+          this.emit(`upgradeComplete`, this.name);
         }
       },
       loop: true, // 이벤트를 계속 반복

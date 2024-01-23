@@ -15,9 +15,12 @@ export class InGameScene extends Phaser.Scene {
   timer: Phaser.Time.TimerEvent;
   missiles: Phaser.Physics.Arcade.Group;
   resourceStates: {
+    income: number;
     gold: ResourceState;
     star: ResourceState;
+    increaseByIncome: () => number;
     decreaseByUpgrade: (payload: { gold?: number; star?: number }) => void;
+    decreaseByPercent: (percent: number) => void;
   };
 
   constructor() {
@@ -44,6 +47,7 @@ export class InGameScene extends Phaser.Scene {
     this.enemies = this.physics.add.group();
     this.missiles = this.physics.add.group();
     this.createEnemy();
+    this.createIncome();
 
     this.physics.add.overlap(
       this.enemies,
@@ -99,6 +103,32 @@ export class InGameScene extends Phaser.Scene {
         if (count === phaseData[index].count) {
           index++;
           count = 0;
+          this.resourceStates.increaseByIncome();
+        }
+      },
+      loop: true,
+      callbackScope: this,
+    });
+  }
+  createIncome() {
+    let index = 0;
+    this.time.addEvent({
+      delay: 1000,
+      callback: () => {
+        index++;
+        if (!!index && index % 5 === 0) {
+          const amount = this.resourceStates.increaseByIncome();
+          if (!amount) {
+            return;
+          }
+          new EaseText(this, {
+            x: this.bunker.x,
+            y: this.bunker.y,
+            text: `+${amount} income`,
+            color: "#619196",
+            duration: 2500,
+          }).setFontSize(18);
+          console.log("increase income");
         }
       },
       loop: true,

@@ -56,9 +56,18 @@ export class InGameUIScene extends Phaser.Scene {
         60
       ),
       star: new ResourceState(this, { x, y: 60, texture: "star" }),
+      income: 0.05,
+      increaseByIncome() {
+        const amount = Math.floor(this.gold.value * this.income);
+        this.gold.increase(amount);
+        return amount;
+      },
       decreaseByUpgrade({ gold, star }) {
         gold && this.gold.decrease(gold);
         star && this.star.decrease(star);
+      },
+      decreaseByPercent(percent: number) {
+        this.gold.decrease(Math.floor(this.gold.value * percent));
       },
     };
     this.createUI(this);
@@ -86,12 +95,11 @@ export class InGameUIScene extends Phaser.Scene {
       }
       const InGameScene = this.scene.get("InGameScene") as InGameScene;
       const { resourceStates } = InGameScene;
-      resourceStates.decreaseByUpgrade({
-        gold:
-          id === "income"
-            ? Math.floor(resourceStates.gold.value / 10)
-            : UPGRADE[id].cost,
-      });
+      id === "income"
+        ? resourceStates.decreaseByPercent(resourceStates.income)
+        : resourceStates.decreaseByUpgrade({
+            gold: UPGRADE[id].cost,
+          });
     });
     const mapUpgradeButton =
       (line = 0) =>

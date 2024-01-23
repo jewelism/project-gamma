@@ -81,7 +81,6 @@ export class InGameUIScene extends Phaser.Scene {
       .setAlpha(0.5);
     // const button = new SelectLevelButton(scene, 100, 100, 1);
     this.uiEventBus.on(`upgradeComplete`, (id: string) => {
-      console.log("upgradeComplete", id);
       if (id.startsWith("attackDamage")) {
         UPGRADE[id].value += 1;
       }
@@ -89,7 +88,9 @@ export class InGameUIScene extends Phaser.Scene {
       const { resourceStates } = InGameScene;
       resourceStates.decreaseByUpgrade({
         gold:
-          id === "income" ? resourceStates.gold.value / 10 : UPGRADE[id].cost,
+          id === "income"
+            ? Math.floor(resourceStates.gold.value / 10)
+            : UPGRADE[id].cost,
       });
     });
     const mapUpgradeButton =

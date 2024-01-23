@@ -54,7 +54,7 @@ export const UPGRADE = {
     value: 1,
     max: 10,
     cost: 0,
-    time: 120 * 1000,
+    time: 120,
     get desc() {
       return `(10%, ${this.time}sec) increase income +0.5%`;
     },
@@ -65,7 +65,7 @@ export const UPGRADE = {
     value: 1,
     max: 15,
     cost: 100,
-    time: 120 * 1000,
+    time: 120,
     get desc() {
       return `(${this.cost}G, ${this.time}sec) upgrade bunker +10HP`;
     },

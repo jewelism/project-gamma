@@ -103,11 +103,7 @@ export class Button extends Phaser.GameObjects.Container {
         width: button.width,
         height: 5,
         color: 0x00ffff,
-      }).setPosition(button.width / 2, button.height - 10);
-      console.log("progressTime2", progressTime);
-
-      // this.setProgressTime(progressTime);
-      // this.add(this.progress);
+      }).setPosition(button.width / 2, button.height / 2 + 10);
     }
 
     if (shortcutText) {
@@ -142,9 +138,12 @@ export class Button extends Phaser.GameObjects.Container {
       callback: () => {
         this.progress.increase(1);
         if (this.progress.value >= this.progress.max) {
-          timerEvent.remove();
+          (this.scene as InGameUIScene).uiEventBus.emit(
+            `upgradeComplete`,
+            this.name
+          );
           this.remove(this.progress);
-          this.emit(`upgradeComplete`, this.name);
+          timerEvent.remove();
         }
       },
       loop: true, // 이벤트를 계속 반복

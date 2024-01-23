@@ -1,5 +1,6 @@
 import { UI } from "@/phaser/constants";
 import { UPGRADE } from "@/phaser/constants/upgrade";
+import { createTitleText } from "@/phaser/phaserUtils/titleText";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { createFlashFn } from "@/phaser/utils/helper";
 
@@ -21,7 +22,9 @@ export class Bunker extends Phaser.GameObjects.Container {
     this.soldiers = new Phaser.GameObjects.Group(scene);
     this.hpBar = new GaugeBar(this.scene, {
       max: UPGRADE.upgradeBunker.value * 10,
-    }).setPosition(0, -40);
+      width: 120,
+      height: 16,
+    }).setPosition(0, -60);
     this.shooterGaugeBar = new GaugeBar(this.scene, {
       max: this.soldierMaxCount,
       value: this.soldiers.getChildren().length,
@@ -40,5 +43,22 @@ export class Bunker extends Phaser.GameObjects.Container {
   decreaseHealth(damage: number) {
     this.hpBar.decrease(damage);
     createFlashFn()(this.sprite);
+    if (this.isDestroyed()) {
+      this.scene.scene.pause();
+      this.setAlpha(0.1);
+      createTitleText(
+        this.scene,
+        "Game Over",
+        Number(this.scene.game.config.height) / 2
+      );
+      this.scene.time.delayedCall(300, () => {
+        const onKeydown = () => {
+          this.scene.scene.start("StartScene");
+        };
+        this.scene.input.keyboard.on("keydown", onKeydown);
+        this.scene.input.on("pointerdown", onKeydown);
+      });
+      this.destroy();
+    }
   }
 }

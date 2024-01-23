@@ -122,7 +122,7 @@ export class InGameScene extends Phaser.Scene {
             return;
           }
           new EaseText(this, {
-            x: this.bunker.x,
+            x: this.bunker.x + 50,
             y: this.bunker.y,
             text: `+${amount} income`,
             color: "#619196",

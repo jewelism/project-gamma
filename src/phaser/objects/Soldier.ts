@@ -29,7 +29,7 @@ export class Soldier extends Phaser.GameObjects.Zone {
 
     scene.add.existing(this);
 
-    this.drawAttackRange(); // for debug
+    this.scene.game.config.physics.arcade?.debug && this.drawAttackRange();
   }
   preUpdate(_time: number, _delta: number): void {
     this.shoot();

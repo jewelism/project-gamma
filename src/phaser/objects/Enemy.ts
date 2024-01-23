@@ -1,6 +1,5 @@
 import { GAME } from "@/phaser/constants";
 import { Bunker } from "@/phaser/objects/Bunker";
-import { createTitleText } from "@/phaser/phaserUtils/titleText";
 import { InGameScene } from "@/phaser/scenes/InGameScene";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { createFlashFn, isOutOfRange } from "@/phaser/utils/helper";
@@ -142,22 +141,6 @@ export class Enemy extends Phaser.GameObjects.Container {
         const bunker = _bunker as Bunker;
         bunker.decreaseHealth(this.attackDamage);
         _missile.destroy();
-        if (!bunker.isDestroyed()) {
-          return;
-        }
-        bunker.setAlpha(0.1);
-        createTitleText(
-          scene,
-          "Game Over",
-          Number(scene.game.config.height) / 2
-        );
-        scene.time.delayedCall(300, () => {
-          const onKeydown = () => {
-            scene.scene.start("StartScene");
-          };
-          scene.input.keyboard.on("keydown", onKeydown);
-          scene.input.on("pointerdown", onKeydown);
-        });
       }
     );
   }

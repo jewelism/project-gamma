@@ -64,10 +64,10 @@ export const UPGRADE = {
   upgradeBunker: {
     value: 1,
     max: 15,
-    cost: 100,
-    time: 120,
+    cost: 10,
+    time: 5,
     get desc() {
-      return `(${this.cost}G, ${this.time}sec) upgrade bunker +10HP`;
+      return `(${this.cost}G, ${this.time}sec) upgrade bunker +10HP +1Regen`;
     },
     shortcutText: "Z",
     spriteKey: "defence1",

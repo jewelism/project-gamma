@@ -18,10 +18,10 @@ export class Missile extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.world.enableBody(this);
     // scene.m_beamSound.play();
-    this.closestEnemy = this.scene.physics.closest(
-      this,
-      (this.scene as InGameScene).enemies.getChildren()
-    );
+    // this.closestEnemy = this.scene.physics.closest(
+    //   this,
+    //   (this.scene as InGameScene).enemies.getChildren()
+    // );
     this.closestEnemy = getRandomEnemyInRange(scene, this.shooter);
     this.setDepth(98);
     (this.scene as InGameScene).bunker.setDepth(99);

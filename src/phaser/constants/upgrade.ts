@@ -52,11 +52,11 @@ export const UPGRADE = {
   },
   income: {
     value: 1,
-    max: 10,
+    max: 50,
     cost: 0,
     time: 120,
     get desc() {
-      return `(10%, ${this.time}sec) increase income +0.5%`;
+      return `(10%G, ${this.time}sec) increase income +0.5%`;
     },
     shortcutText: "X",
     spriteKey: "book1",

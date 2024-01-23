@@ -10,6 +10,7 @@ export class Bunker extends Phaser.GameObjects.Container {
   hpBar: GaugeBar;
   soldiers: Phaser.GameObjects.Group;
   soldierMaxCount = 10;
+  hpRegen = 0;
 
   constructor(scene) {
     super(
@@ -24,6 +25,7 @@ export class Bunker extends Phaser.GameObjects.Container {
       max: UPGRADE.upgradeBunker.value * 10,
       width: 120,
       height: 16,
+      showText: true,
     }).setPosition(0, -60);
     this.shooterGaugeBar = new GaugeBar(this.scene, {
       max: this.soldierMaxCount,
@@ -35,6 +37,8 @@ export class Bunker extends Phaser.GameObjects.Container {
     scene.physics.add.existing(this, true);
     scene.add.existing(this);
     (this.body as any).setCircle(30);
+
+    this.hpRegenPerSec();
   }
   protected preUpdate(_time: number, _delta: number): void {}
   isDestroyed() {
@@ -60,5 +64,29 @@ export class Bunker extends Phaser.GameObjects.Container {
       });
       this.destroy();
     }
+  }
+  upgrade() {
+    this.hpRegen += 1;
+    this.hpBar.max += 10;
+    this.hpBar.value += 10;
+    this.hpBar.updateBar(this.hpBar.value);
+    this.shooterGaugeBar.max += 1;
+    this.shooterGaugeBar.updateBar(this.shooterGaugeBar.value);
+  }
+  hpRegenPerSec() {
+    this.scene.time.addEvent({
+      delay: 1000,
+      callback: () => {
+        if (this.isDestroyed()) {
+          return;
+        }
+        if (this.hpBar.value >= this.hpBar.max) {
+          return;
+        }
+        this.hpBar.value += this.hpRegen;
+        this.hpBar.updateBar(this.hpBar.value);
+      },
+      loop: true,
+    });
   }
 }

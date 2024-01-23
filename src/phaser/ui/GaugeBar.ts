@@ -1,10 +1,11 @@
-export class GaugeBar extends Phaser.GameObjects.Graphics {
+export class GaugeBar extends Phaser.GameObjects.Container {
   max: number;
   value: number;
-  width: number;
-  height: number;
   color: number;
   lineColor: number;
+  showText: boolean;
+  bar: Phaser.GameObjects.Graphics;
+  hpText: Phaser.GameObjects.Text;
 
   constructor(
     scene,
@@ -15,6 +16,7 @@ export class GaugeBar extends Phaser.GameObjects.Graphics {
       height = 6,
       color = 0xff0000,
       lineColor = 0x000000,
+      showText = false,
     }: {
       max: number;
       value?: number;
@@ -22,6 +24,7 @@ export class GaugeBar extends Phaser.GameObjects.Graphics {
       height?: number;
       color?: number;
       lineColor?: number;
+      showText?: boolean;
     }
   ) {
     super(scene);
@@ -32,20 +35,28 @@ export class GaugeBar extends Phaser.GameObjects.Graphics {
     this.color = color;
     this.lineColor = lineColor;
     this.value = value !== undefined ? value : max;
+    this.bar = new Phaser.GameObjects.Graphics(scene);
+    this.showText = showText;
 
+    this.add(this.bar);
+    if (this.showText) {
+      this.showHpText();
+    }
     this.updateBar(this.value);
   }
   updateBar(value: number) {
-    this.clear();
-    this.fillStyle(this.color, 1);
+    this.bar.clear();
+    this.bar.fillStyle(this.color, 1);
     const valueWidth = (value / this.max) * this.width;
-
     const ownerBarGapY = 10;
 
-    this.fillRect(-this.width / 2, ownerBarGapY, valueWidth, this.height);
-    this.lineStyle(1, this.lineColor);
-    this.strokeRect(-this.width / 2, ownerBarGapY, this.width, this.height);
-    this.strokePath();
+    this.bar.fillRect(-this.width / 2, ownerBarGapY, valueWidth, this.height);
+    this.bar.lineStyle(1, this.lineColor);
+    this.bar.strokeRect(-this.width / 2, ownerBarGapY, this.width, this.height);
+    this.bar.strokePath().setDepth(9998);
+    if (this.showText) {
+      this.updateText();
+    }
   }
   increase(value: number) {
     if (this.value >= this.max) {
@@ -68,5 +79,23 @@ export class GaugeBar extends Phaser.GameObjects.Graphics {
       this.value -= value;
     }
     this.updateBar(this.value);
+  }
+  showHpText() {
+    this.hpText = new Phaser.GameObjects.Text(
+      this.scene,
+      this.x,
+      this.y + 18,
+      `${this.value}/${this.max}`,
+      {
+        fontSize: "12px",
+        color: "#ffffff",
+      }
+    )
+      .setOrigin(0.5)
+      .setDepth(this.depth + 1);
+    this.add(this.hpText);
+  }
+  updateText() {
+    this.hpText.setText(`${this.value}/${this.max}`);
   }
 }

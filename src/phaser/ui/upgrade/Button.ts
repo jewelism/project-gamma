@@ -143,6 +143,7 @@ export class Button extends Phaser.GameObjects.Container {
             this.name
           );
           this.remove(this.progress);
+          this.progress.destroy();
           timerEvent.remove();
         }
       },

@@ -69,6 +69,7 @@ export const getBetweenAroundInfo = (scene: Phaser.Scene, count) => {
   const spacing = (gameWidth - rectWidth * count) / (count + 1);
   return {
     rectWidth,
-    getX: (index: number) => spacing + index * (rectWidth + spacing),
+    getX: (index: number) => spacing + (index % count) * (rectWidth + spacing),
+    getLine: (index: number) => Math.floor(index / count),
   };
 };

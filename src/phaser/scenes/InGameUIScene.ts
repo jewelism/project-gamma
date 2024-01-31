@@ -24,10 +24,13 @@ const UPGRADE_BUTTON = {
 
 export class InGameUIScene extends Phaser.Scene {
   uiContainer: Phaser.GameObjects.Container;
-  attackerStateButtonGroup: Phaser.GameObjects.Group;
   uiEventBus: Phaser.Events.EventEmitter;
   tapContainer: Phaser.GameObjects.Container;
   upgradeButtonContainer: Phaser.GameObjects.Container;
+  buttonGroup: {
+    add: Phaser.GameObjects.Group;
+    attackerState: Phaser.GameObjects.Group;
+  } = {} as any;
 
   constructor() {
     super("InGameUIScene");
@@ -39,7 +42,8 @@ export class InGameUIScene extends Phaser.Scene {
     this.createBottomWrap(this);
     this.createBottomTap(this);
     this.createAddButtons(this);
-    // this.createAttackersStateButton(this);
+    this.createUnitButtons(this);
+
     // this.createTimer(1, () => {
     //   console.log("game over");
     // });
@@ -66,6 +70,18 @@ export class InGameUIScene extends Phaser.Scene {
         InGameScene.bunker.upgrade();
       }
       // TODO: 업그레이드 완료 사운드 재생
+    });
+    this.uiEventBus.on(`tap`, (id: string) => {
+      Object.values(this.buttonGroup).forEach((group) => {
+        group.getChildren().forEach((button: Button) => {
+          button.setActive(false);
+          button.setVisible(false);
+        });
+      });
+      this.buttonGroup[id].getChildren().forEach((button: Button) => {
+        button.setActive(true);
+        button.setVisible(true);
+      });
     });
   }
   createResourceState() {
@@ -114,10 +130,10 @@ export class InGameUIScene extends Phaser.Scene {
   }
   createBottomTap(scene: Phaser.Scene) {
     const buttons = [
-      // TODO: 현유닛 현황판 추가해야됨
       { id: "add", shortcutText: "Z", texture: "sword1" },
-      { id: "damage", shortcutText: "X", texture: "sword1" },
+      { id: "attack", shortcutText: "X", texture: "sword1" },
       { id: "defence", shortcutText: "C", texture: "defence1" },
+      { id: "attackerState", shortcutText: "V", texture: "sword1" },
     ];
     const { rectWidth, getX } = getBetweenAroundInfo(scene, buttons.length);
 
@@ -131,6 +147,7 @@ export class InGameUIScene extends Phaser.Scene {
         spriteKey: texture,
         shortcutText,
         onClick: () => {
+          this.uiEventBus.emit(`tap`, id);
           console.log("id", id);
         },
       });
@@ -138,17 +155,17 @@ export class InGameUIScene extends Phaser.Scene {
     });
   }
   createAddButtons(scene: Phaser.Scene) {
-    const { rectWidth, getX } = getBetweenAroundInfo(scene, 2);
+    const { rectWidth, getLine, getX } = getBetweenAroundInfo(scene, 2);
     const mapUpgradeButton = (
       [id, { spriteKey, desc, shortcutText }],
       index
     ) => {
-      const line = Math.floor(index / 2);
+      const line = getLine(index);
       const button = new Button(scene, {
-        x: getX(index % 2),
-        y: line * 50 + UPGRADE_BUTTON.paddingBottom * line,
+        x: getX(index),
+        y: line * UPGRADE_BUTTON.height + UPGRADE_BUTTON.paddingBottom * line,
         width: rectWidth,
-        height: 50,
+        height: UPGRADE_BUTTON.height,
         spriteKey,
         tooltipText: desc,
         shortcutText,
@@ -169,8 +186,57 @@ export class InGameUIScene extends Phaser.Scene {
       return button;
     };
 
-    const buttons = Object.entries(UPGRADE_V2.addSoldier).map(mapUpgradeButton);
-    this.upgradeButtonContainer.add(buttons);
+    this.buttonGroup.add = new Phaser.GameObjects.Group(
+      scene,
+      Object.entries(UPGRADE_V2.addSoldier).map(mapUpgradeButton)
+    );
+    this.upgradeButtonContainer.add(this.buttonGroup.add.getChildren());
+  }
+  createUnitButtons(scene: Phaser.Scene) {
+    const inGameScene = this.scene.get("InGameScene") as InGameScene;
+    const { rectWidth, getLine, getX } = getBetweenAroundInfo(scene, 3);
+
+    const length = 18;
+    const attackerStateButtons = Array.from({ length }, (_, index) => {
+      const line = getLine(index);
+      const grade = index + 1;
+      const price = grade * 5;
+      const button = new SoldierStateButton(scene, {
+        x: getX(index),
+        y: line * UPGRADE_BUTTON.height + UPGRADE_BUTTON.paddingBottom * line,
+        width: rectWidth,
+        height: UPGRADE_BUTTON.height,
+        spriteKey: "star",
+        tooltipText: `sell ★${grade} (${price}G)`,
+        gradeText: `★${grade}`,
+        onClick: () => {
+          const soldier = inGameScene.bunker.soldiers
+            .getChildren()
+            .find((sol: Soldier) => sol.grade === grade);
+          if (!soldier) {
+            return;
+          }
+          inGameScene.bunker.soldiers.remove(soldier);
+          soldier.destroy();
+          inGameScene.bunker.shooterGaugeBar.decrease(1);
+          this.buttonGroup.attackerState
+            .getMatching("name", `grade${grade}`)
+            .forEach((button: SoldierStateButton) => {
+              button.decreaseCountText();
+            });
+          inGameScene.resourceStates.gold.increase(price);
+        },
+      })
+        .setName(`grade${grade}`)
+        .setActive(false)
+        .setVisible(false);
+      return button;
+    });
+    this.upgradeButtonContainer.add(attackerStateButtons);
+    this.buttonGroup.attackerState = new Phaser.GameObjects.Group(
+      scene,
+      attackerStateButtons
+    );
   }
   increaseSoldier({ id, button }) {
     const InGameScene = this.scene.get("InGameScene") as InGameScene;
@@ -198,6 +264,12 @@ export class InGameUIScene extends Phaser.Scene {
     }).setFontSize(20);
     this.increaseAttackersStateButton(grade);
   }
+  increaseAttackersStateButton(grade: number) {
+    const button = this.buttonGroup.attackerState
+      .getChildren()
+      .find(({ name }) => name === `grade${grade}`) as SoldierStateButton;
+    button.increaseCountText();
+  }
   increaseAttackDamage({ id, button }) {
     const InGameScene = this.scene.get("InGameScene") as InGameScene;
 
@@ -214,55 +286,6 @@ export class InGameUIScene extends Phaser.Scene {
     const InGameScene = this.scene.get("InGameScene") as InGameScene;
     InGameScene.resourceStates.income += 0.05;
     button.setCountText(`${InGameScene.resourceStates.income * 100}%`);
-  }
-  increaseAttackersStateButton(grade: number) {
-    const button = this.attackerStateButtonGroup
-      .getChildren()
-      .find(({ name }) => name === `grade${grade}`) as SoldierStateButton;
-    button.increaseCountText();
-    button.setAlpha(1);
-  }
-  createAttackersStateButton(scene: Phaser.Scene) {
-    const inGameScene = this.scene.get("InGameScene") as InGameScene;
-    const length = 18;
-    const attackerStateButtons = Array.from({ length }, (_, index) => {
-      const grade = index + 1;
-      const price = grade * 5;
-      const button = new SoldierStateButton(scene, {
-        x: 50 * (index % (length / 3)),
-        y: index >= length / 3 ? (index >= 12 ? 100 : 50) : 0,
-        width: 50,
-        height: 50,
-        spriteKey: "star",
-        tooltipText: `sell ★${grade} (${price}G)`,
-        gradeText: `★${grade}`,
-        onClick: () => {
-          const soldier = inGameScene.bunker.soldiers
-            .getChildren()
-            .find((sol: Soldier) => sol.grade === grade);
-          if (!soldier) {
-            return;
-          }
-          inGameScene.bunker.soldiers.remove(soldier);
-          soldier.destroy();
-          inGameScene.bunker.shooterGaugeBar.decrease(1);
-          this.attackerStateButtonGroup
-            .getMatching("name", `grade${grade}`)
-            .forEach((button: SoldierStateButton) => {
-              button.decreaseCountText();
-            });
-          inGameScene.resourceStates.gold.increase(price);
-        },
-      })
-        .setName(`grade${grade}`)
-        .setAlpha(0);
-      this.uiContainer.add(button);
-      return button;
-    });
-    this.attackerStateButtonGroup = new Phaser.GameObjects.Group(
-      scene,
-      attackerStateButtons
-    );
   }
   createTimer(min: number, callback: () => void) {
     let remainingTime = min * 60;

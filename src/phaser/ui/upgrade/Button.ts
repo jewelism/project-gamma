@@ -45,6 +45,9 @@ export class Button extends Phaser.GameObjects.Container {
       if (!onClick) {
         return;
       }
+      if (!this.active) {
+        return;
+      }
       onClick(() => {
         button.setAlpha(0.4);
         icon.setAlpha(0.4);

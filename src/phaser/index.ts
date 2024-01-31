@@ -12,8 +12,8 @@ const config: Phaser.Types.Core.GameConfig = {
   pixelArt: true,
   scale: {
     mode: Phaser.Scale.FIT,
-    width: 667 * 1.5,
-    height: 375 * 1.5,
+    width: 375 * 1.5,
+    height: 667 * 1.5,
   },
   physics: {
     default: "arcade",

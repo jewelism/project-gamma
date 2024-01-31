@@ -17,7 +17,7 @@ export class Button extends Phaser.GameObjects.Container {
       width,
       height,
       spriteKey,
-      tooltipText,
+      tooltipText = "",
       shortcutText,
       enableCountText = false,
       progressTime = 0,
@@ -28,7 +28,7 @@ export class Button extends Phaser.GameObjects.Container {
       width: number;
       height: number;
       spriteKey: string;
-      tooltipText: string;
+      tooltipText?: string;
       shortcutText?: string;
       enableCountText?: boolean;
       progressTime?: number;
@@ -37,6 +37,9 @@ export class Button extends Phaser.GameObjects.Container {
   ) {
     super(scene, x, y);
     this.tooltip = new ToolTip(scene, { x, y, hoverText: tooltipText });
+    if (!tooltipText) {
+      this.tooltip.setAlpha(0);
+    }
 
     const onKeyDown = () => {
       if (!onClick) {

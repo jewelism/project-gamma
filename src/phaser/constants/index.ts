@@ -3,7 +3,7 @@ export const GAME = {
 };
 
 export const UI = {
-  height: 150,
+  height: 400,
 };
 
 export const TEXT_STYLE = {

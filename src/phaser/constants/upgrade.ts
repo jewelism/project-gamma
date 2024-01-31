@@ -34,6 +34,18 @@ function createAddSoldier(id: string, shortcutText: string) {
     },
   };
 }
+export const UPGRADE_V2 = {
+  addSoldier: {
+    ...createAddSoldier("addSoldier1_6", "Q"),
+    ...createAddSoldier("addSoldier7_12", "W"),
+    ...createAddSoldier("addSoldier13_18", "E"),
+  },
+  attackDamage: {
+    ...createAttackDamage("attackDamage7_9", "D"),
+    ...createAttackDamage("attackDamage4_6", "S"),
+    ...createAttackDamage("attackDamage1_3", "A"),
+  },
+};
 export const UPGRADE = {
   ...createAddSoldier("addSoldier13_18", "E"),
   ...createAddSoldier("addSoldier7_12", "W"),

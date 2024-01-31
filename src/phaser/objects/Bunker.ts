@@ -47,23 +47,24 @@ export class Bunker extends Phaser.GameObjects.Container {
   decreaseHealth(damage: number) {
     this.hpBar.decrease(damage);
     createFlashFn()(this.sprite);
-    if (this.isDestroyed()) {
-      this.scene.scene.pause();
-      this.setAlpha(0.1);
-      createTitleText(
-        this.scene,
-        "Game Over",
-        Number(this.scene.game.config.height) / 2
-      );
-      this.scene.time.delayedCall(300, () => {
-        const onKeydown = () => {
-          this.scene.scene.start("StartScene");
-        };
-        this.scene.input.keyboard.on("keydown", onKeydown);
-        this.scene.input.on("pointerdown", onKeydown);
-      });
-      this.destroy();
+    if (!this.isDestroyed()) {
+      return;
     }
+    this.scene.scene.pause();
+    this.setAlpha(0.1);
+    createTitleText(
+      this.scene,
+      "Game Over",
+      Number(this.scene.game.config.height) / 2
+    );
+    this.scene.time.delayedCall(300, () => {
+      const onKeydown = () => {
+        this.scene.scene.start("StartScene");
+      };
+      this.scene.input.keyboard.on("keydown", onKeydown);
+      this.scene.input.on("pointerdown", onKeydown);
+    });
+    this.destroy();
   }
   upgrade() {
     this.hpRegen += 1;

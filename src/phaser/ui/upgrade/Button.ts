@@ -32,7 +32,7 @@ export class Button extends Phaser.GameObjects.Container {
       shortcutText?: string;
       enableCountText?: boolean;
       progressTime?: number;
-      onClick?: (fn: () => void) => void;
+      onClick?: (progressClick: () => void) => void;
     }
   ) {
     super(scene, x, y);

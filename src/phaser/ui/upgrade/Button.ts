@@ -131,10 +131,10 @@ export class Button extends Phaser.GameObjects.Container {
     this.tooltip.buttonText.setText(text);
   }
   setCountText(grade: string | number) {
-    this.countText.setText(String(grade));
+    return this.countText.setText(String(grade));
   }
   increaseCountText(amount: number = 1) {
-    this.setCountText(Number(this.countText.text) + amount);
+    return this.setCountText(Number(this.countText.text) + amount);
   }
   setProgressTime(time: number) {
     this.progress.max = time;

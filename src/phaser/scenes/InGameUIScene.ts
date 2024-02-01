@@ -43,7 +43,7 @@ export class InGameUIScene extends Phaser.Scene {
     this.createBottomTap(this);
     this.createAddButtons(this);
     this.createUnitButtons(this);
-
+    this.uiEventBus.emit(`tap`, "add");
     // this.createTimer(1, () => {
     //   console.log("game over");
     // });
@@ -65,7 +65,6 @@ export class InGameUIScene extends Phaser.Scene {
         this.increaseIncome();
       }
       if (id.startsWith("upgradeBunker")) {
-        console.log("upgradeBunker");
         UPGRADE[id].value += 1;
         InGameScene.bunker.upgrade();
       }
@@ -79,6 +78,12 @@ export class InGameUIScene extends Phaser.Scene {
         });
       });
       this.buttonGroup[id].getChildren().forEach((button: Button) => {
+        if (
+          id.startsWith("attackerState") &&
+          Number(button.countText.text) <= 0
+        ) {
+          return;
+        }
         button.setActive(true);
         button.setVisible(true);
       });
@@ -141,14 +146,13 @@ export class InGameUIScene extends Phaser.Scene {
       const x = getX(index);
       const button = new Button(scene, {
         x,
-        y: 0,
+        y: 10,
         width: rectWidth,
         height: 50,
         spriteKey: texture,
         shortcutText,
         onClick: () => {
           this.uiEventBus.emit(`tap`, id);
-          console.log("id", id);
         },
       });
       this.tapContainer.add(button);
@@ -161,6 +165,7 @@ export class InGameUIScene extends Phaser.Scene {
       index
     ) => {
       const line = getLine(index);
+
       const button = new Button(scene, {
         x: getX(index),
         y: line * UPGRADE_BUTTON.height + UPGRADE_BUTTON.paddingBottom * line,
@@ -182,7 +187,10 @@ export class InGameUIScene extends Phaser.Scene {
           this.increaseSoldier({ id, button });
           fn();
         },
-      }).setName(id);
+      })
+        .setName(id)
+        .setVisible(false)
+        .setActive(false);
       return button;
     };
 
@@ -268,7 +276,7 @@ export class InGameUIScene extends Phaser.Scene {
     const button = this.buttonGroup.attackerState
       .getChildren()
       .find(({ name }) => name === `grade${grade}`) as SoldierStateButton;
-    button.increaseCountText();
+    button.increaseCountText().setVisible(true).setActive(true);
   }
   increaseAttackDamage({ id, button }) {
     const InGameScene = this.scene.get("InGameScene") as InGameScene;

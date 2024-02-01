@@ -24,7 +24,6 @@ function createAddSoldier(id: string, shortcutText: string) {
   const cost = gradeStart * 20;
   return {
     [id]: {
-      value: 1,
       cost,
       get desc() {
         return `(${cost}G) add ★${gradeStart}~★${gradeEnd}`;

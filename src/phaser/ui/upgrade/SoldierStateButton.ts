@@ -41,12 +41,12 @@ export class SoldierStateButton extends Button {
   decreaseCountText(amount: number = 1) {
     const current = Number(this.countText.text);
     if (current <= 0) {
-      return;
+      return this;
     }
     const count = current - amount;
     if (!count) {
       this.setAlpha(0);
     }
-    this.setCountText(count ? count : "");
+    return this.setCountText(count ? count : "");
   }
 }

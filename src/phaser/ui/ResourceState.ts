@@ -1,7 +1,8 @@
 import { TEXT_STYLE } from "@/phaser/constants";
+import { effect, signal } from "@preact/signals-core";
 
 export class ResourceState extends Phaser.GameObjects.Container {
-  value: number = 0;
+  value = signal(0);
   backgroundColor: Phaser.GameObjects.Rectangle;
   iconImage: Phaser.GameObjects.Image;
   text: Phaser.GameObjects.Text;
@@ -37,15 +38,17 @@ export class ResourceState extends Phaser.GameObjects.Container {
       .setName(texture)
       .add([this.text, this.backgroundColor, this.iconImage]);
     scene.add.existing(this);
+
+    effect(() => {
+      this.text.setText(String(this.value.value));
+    });
   }
   increase(amount: number) {
-    this.value += amount;
-    this.text.setText(String(this.value));
+    this.value.value += amount;
     return this;
   }
   decrease(amount: number) {
-    this.value -= amount;
-    this.text.setText(String(this.value));
+    this.value.value -= amount;
     return this;
   }
   setXAll(x: number) {

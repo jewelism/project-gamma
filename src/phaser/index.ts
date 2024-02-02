@@ -2,7 +2,7 @@ import * as Phaser from "phaser";
 
 import { StartScene } from "@/phaser/scenes/StartScene";
 import { InGameScene } from "@/phaser/scenes/InGameScene";
-import { InGameUIScene } from "@/phaser/scenes/InGameUIScene";
+import { InGameUIScene } from "@/phaser/scenes/ui/InGameUIScene";
 
 const config: Phaser.Types.Core.GameConfig = {
   title: "project alpha",

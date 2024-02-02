@@ -1,5 +1,5 @@
 import { TEXT_STYLE } from "@/phaser/constants";
-import { InGameUIScene } from "@/phaser/scenes/InGameUIScene";
+import { InGameUIScene } from "@/phaser/scenes/ui/InGameUIScene";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { ToolTip } from "@/phaser/ui/ToolTip";
 

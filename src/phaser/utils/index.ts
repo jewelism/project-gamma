@@ -6,3 +6,6 @@ export const convertSecondsToMinSec = (seconds) => {
 export function removeAlphabets(str) {
   return str.replace(/[a-zA-Z]/g, "");
 }
+export const removeExceptAlphabets = (str) => {
+  return str.replace(/[^a-zA-Z]/g, "");
+};

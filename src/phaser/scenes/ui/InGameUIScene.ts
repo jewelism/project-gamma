@@ -4,9 +4,9 @@ import { UI } from "@/phaser/constants";
 import { convertSecondsToMinSec } from "@/phaser/utils";
 import { Button } from "@/phaser/ui/upgrade/Button";
 import {
-  UPGRADE,
   UPGRADE_V2,
   getSoldierGradeById,
+  getUpgradeTabName,
 } from "@/phaser/constants/upgrade";
 import { Soldier } from "@/phaser/objects/Soldier";
 import { EaseText } from "@/phaser/ui/EaseText";
@@ -29,7 +29,8 @@ export class InGameUIScene extends Phaser.Scene {
   tapContainer: Phaser.GameObjects.Container;
   upgradeButtonContainer: Phaser.GameObjects.Container;
   buttonGroup: {
-    add: Phaser.GameObjects.Group;
+    attackDamage: Phaser.GameObjects.Group;
+    addSoldier: Phaser.GameObjects.Group;
     util: Phaser.GameObjects.Group;
     attackerState: Phaser.GameObjects.Group;
   } = {} as any;
@@ -44,31 +45,32 @@ export class InGameUIScene extends Phaser.Scene {
     this.createBottomWrap(this);
     this.createBottomTap(this);
     this.createAddButtons(this);
+    this.createDamageButtons(this);
     this.createUtilButtons(this);
     this.createUnitButtons(this);
-    this.uiEventBus.emit(`tap`, "add");
+    this.uiEventBus.emit(`tap`, "addSoldier");
     // this.createTimer(1, () => {
     //   console.log("game over");
     // });
   }
   bindEventBus() {
     this.uiEventBus.on(`upgradeComplete`, (id: string) => {
-      if (id.startsWith("attackDamage")) {
-        UPGRADE[id].value += 1;
-      }
       const InGameScene = this.scene.get("InGameScene") as InGameScene;
       const { resourceStates } = InGameScene;
+      const upgradeObj = UPGRADE_V2[getUpgradeTabName(id)][id];
       id === "income"
         ? resourceStates.decreaseByPercent(resourceStates.income)
         : resourceStates.decreaseByUpgrade({
-            gold: UPGRADE[id].cost,
+            gold: upgradeObj.cost,
           });
-
       if (id.startsWith("income")) {
         this.increaseIncome();
       }
+      if (id.startsWith("attackDamage")) {
+        upgradeObj.current.value += 1;
+      }
       if (id.startsWith("upgradeBunker")) {
-        UPGRADE[id].value += 1;
+        upgradeObj.current.value += 1;
         InGameScene.bunker.upgrade();
       }
       // TODO: 업그레이드 완료 사운드 재생
@@ -138,8 +140,8 @@ export class InGameUIScene extends Phaser.Scene {
   }
   createBottomTap(scene: Phaser.Scene) {
     const buttons = [
-      { id: "add", shortcutText: "Z", texture: "sword1" },
-      { id: "attack", shortcutText: "X", texture: "sword1" },
+      { id: "addSoldier", shortcutText: "Z", texture: "sword1" },
+      { id: "attackDamage", shortcutText: "X", texture: "sword1" },
       { id: "util", shortcutText: "C", texture: "" },
       { id: "attackerState", shortcutText: "V", texture: "sword1" },
     ];
@@ -178,7 +180,7 @@ export class InGameUIScene extends Phaser.Scene {
         tooltipText: desc,
         shortcutText,
         onClick: (progressClick) => {
-          if (!this.canUpgrade({ id })) {
+          if (!this.canUpgrade({ tab: "addSoldier", id })) {
             return;
           }
           this.increaseSoldier({ id, button });
@@ -191,11 +193,48 @@ export class InGameUIScene extends Phaser.Scene {
       return button;
     };
 
-    this.buttonGroup.add = new Phaser.GameObjects.Group(
+    this.buttonGroup.addSoldier = new Phaser.GameObjects.Group(
       scene,
       Object.entries(UPGRADE_V2.addSoldier).map(mapUpgradeButton)
     );
-    this.upgradeButtonContainer.add(this.buttonGroup.add.getChildren());
+    this.upgradeButtonContainer.add(this.buttonGroup.addSoldier.getChildren());
+  }
+  createDamageButtons(scene: Phaser.Scene) {
+    const { rectWidth, getLine, getX } = getBetweenAroundInfo(scene, 2);
+    const mapUpgradeButton = (
+      [id, { spriteKey, desc, shortcutText }],
+      index
+    ) => {
+      const line = getLine(index);
+
+      const button = new Button(scene, {
+        x: getX(index),
+        y: line * UPGRADE_BUTTON.height + UPGRADE_BUTTON.paddingBottom * line,
+        width: rectWidth,
+        height: UPGRADE_BUTTON.height,
+        spriteKey,
+        tooltipText: desc,
+        shortcutText,
+        onClick: (progressClick) => {
+          if (!this.canUpgrade({ tab: "attackDamage", id })) {
+            return;
+          }
+          this.increaseAttackDamage({ id, button });
+          progressClick();
+        },
+      })
+        .setName(id)
+        .setVisible(false)
+        .setActive(false);
+      return button;
+    };
+    this.buttonGroup.attackDamage = new Phaser.GameObjects.Group(
+      scene,
+      Object.entries(UPGRADE_V2.attackDamage).map(mapUpgradeButton)
+    );
+    this.upgradeButtonContainer.add(
+      this.buttonGroup.attackDamage.getChildren()
+    );
   }
   createUtilButtons(scene: Phaser.Scene) {
     const { rectWidth, getLine, getX } = getBetweenAroundInfo(scene, 2);
@@ -215,7 +254,7 @@ export class InGameUIScene extends Phaser.Scene {
         shortcutText,
         progressTime: time,
         onClick: (progressClick) => {
-          if (!this.canUpgrade({ id })) {
+          if (!this.canUpgrade({ tab: "util", id })) {
             return;
           }
           // this.increaseSoldier({ id, button });
@@ -294,7 +333,8 @@ export class InGameUIScene extends Phaser.Scene {
       grade,
     });
     InGameScene.bunker.soldiers.add(soldier);
-    button.setTooltipText(UPGRADE[id].desc);
+    // TODO: 이부분 reactive하게 바꾸자.
+    button.setTooltipText(UPGRADE_V2.addSoldier[id].desc);
     InGameScene.bunker.shooterGaugeBar.increase(1);
     new EaseText(InGameScene, {
       x: InGameScene.bunker.x - 30,
@@ -328,12 +368,12 @@ export class InGameUIScene extends Phaser.Scene {
     InGameScene.resourceStates.income += 0.05;
     button.setCountText(`${InGameScene.resourceStates.income * 100}%`);
   }
-  canUpgrade({ id }) {
+  canUpgrade({ tab, id }) {
     const InGameScene = this.scene.get("InGameScene") as InGameScene;
     const { resourceStates } = InGameScene;
     if (
-      resourceStates.gold.value < UPGRADE[id].cost ||
-      UPGRADE[id].value >= UPGRADE[id].max
+      resourceStates.gold.value.value < UPGRADE_V2[tab][id].cost ||
+      UPGRADE_V2[tab][id].value >= UPGRADE_V2[tab][id].max
     ) {
       // TODO: 업그레이드 불가능한 경우 버저를 울린다.
       return false;

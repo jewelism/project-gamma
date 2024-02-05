@@ -181,7 +181,7 @@ export class InGameUIScene extends Phaser.Scene {
           if (!this.canUpgrade({ tab: "addSoldier", id })) {
             return;
           }
-          this.increaseSoldier({ id, button });
+          this.increaseSoldier({ id });
           progressClick();
         },
       })
@@ -216,7 +216,7 @@ export class InGameUIScene extends Phaser.Scene {
           if (!this.canUpgrade({ tab: "attackDamage", id })) {
             return;
           }
-          this.increaseAttackDamage({ id, button });
+          this.increaseAttackDamage({ id });
           progressClick();
         },
       })
@@ -312,7 +312,7 @@ export class InGameUIScene extends Phaser.Scene {
       attackerStateButtons
     );
   }
-  increaseSoldier({ id, button }) {
+  increaseSoldier({ id }) {
     const InGameScene = this.scene.get("InGameScene") as InGameScene;
     if (
       InGameScene.bunker.soldiers.getChildren().length >=
@@ -343,7 +343,7 @@ export class InGameUIScene extends Phaser.Scene {
       .find(({ name }) => name === `grade${grade}`) as SoldierStateButton;
     button.currentCount.value += 1;
   }
-  increaseAttackDamage({ id, button }) {
+  increaseAttackDamage({ id }) {
     const InGameScene = this.scene.get("InGameScene") as InGameScene;
 
     const [gradeStart, gradeEnd] = getSoldierGradeById(id);
@@ -352,13 +352,12 @@ export class InGameUIScene extends Phaser.Scene {
         soldier.damage += soldier.grade;
       }
     });
-    button.increaseCountText();
+    const upgradeObj = UPGRADE_V2.attackDamage[id];
+    upgradeObj.cost += gradeStart * 10;
   }
   increaseIncome() {
-    const button: Button = this.uiContainer.getByName("income");
     const InGameScene = this.scene.get("InGameScene") as InGameScene;
     InGameScene.resourceStates.income += 0.05;
-    button.setCountText(`${InGameScene.resourceStates.income * 100}%`);
   }
   canUpgrade({ tab, id }) {
     const InGameScene = this.scene.get("InGameScene") as InGameScene;

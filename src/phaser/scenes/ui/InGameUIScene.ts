@@ -78,8 +78,7 @@ export class InGameUIScene extends Phaser.Scene {
     this.uiEventBus.on(`tap`, (id: string) => {
       Object.values(this.buttonGroup).forEach((group) => {
         group.getChildren().forEach((button: Button) => {
-          button.setActive(false);
-          button.setVisible(false);
+          button.setEnable(false);
         });
       });
       this.buttonGroup[id].getChildren().forEach((button: Button) => {
@@ -89,8 +88,7 @@ export class InGameUIScene extends Phaser.Scene {
         ) {
           return;
         }
-        button.setActive(true);
-        button.setVisible(true);
+        button.setEnable(true);
       });
     });
   }
@@ -188,8 +186,7 @@ export class InGameUIScene extends Phaser.Scene {
         },
       })
         .setName(id)
-        .setVisible(false)
-        .setActive(false);
+        .setEnable(false);
       return button;
     };
 
@@ -224,8 +221,7 @@ export class InGameUIScene extends Phaser.Scene {
         },
       })
         .setName(id)
-        .setVisible(false)
-        .setActive(false);
+        .setEnable(false);
       return button;
     };
     this.buttonGroup.attackDamage = new Phaser.GameObjects.Group(
@@ -262,8 +258,7 @@ export class InGameUIScene extends Phaser.Scene {
         },
       })
         .setName(id)
-        .setVisible(false)
-        .setActive(false);
+        .setEnable(false);
       return button;
     };
     this.buttonGroup.util = new Phaser.GameObjects.Group(
@@ -308,8 +303,7 @@ export class InGameUIScene extends Phaser.Scene {
         },
       })
         .setName(`grade${grade}`)
-        .setActive(false)
-        .setVisible(false);
+        .setEnable(false);
       return button;
     });
     this.upgradeButtonContainer.add(attackerStateButtons);
@@ -333,8 +327,6 @@ export class InGameUIScene extends Phaser.Scene {
       grade,
     });
     InGameScene.bunker.soldiers.add(soldier);
-    // TODO: 이부분 reactive하게 바꾸자.
-    button.setTooltipText(UPGRADE_V2.addSoldier[id].desc);
     InGameScene.bunker.shooterGaugeBar.increase(1);
     new EaseText(InGameScene, {
       x: InGameScene.bunker.x - 30,
@@ -349,7 +341,7 @@ export class InGameUIScene extends Phaser.Scene {
     const button = this.buttonGroup.attackerState
       .getChildren()
       .find(({ name }) => name === `grade${grade}`) as SoldierStateButton;
-    button.increaseCountText().setVisible(true).setActive(true);
+    button.currentCount.value += 1;
   }
   increaseAttackDamage({ id, button }) {
     const InGameScene = this.scene.get("InGameScene") as InGameScene;

@@ -2,12 +2,14 @@ import { TEXT_STYLE } from "@/phaser/constants";
 import { InGameUIScene } from "@/phaser/scenes/ui/InGameUIScene";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { ToolTip } from "@/phaser/ui/ToolTip";
+import { effect, signal } from "@preact/signals-core";
 
 export class Button extends Phaser.GameObjects.Container {
   progress: GaugeBar;
   tooltip: ToolTip;
   shortcutText: Phaser.GameObjects.Text;
   countText: Phaser.GameObjects.Text;
+  currentCount = signal(0);
 
   constructor(
     scene: Phaser.Scene,
@@ -91,17 +93,27 @@ export class Button extends Phaser.GameObjects.Container {
       spriteKey
     );
 
-    this.countText = new Phaser.GameObjects.Text(
-      scene,
-      button.width - 10,
-      button.height - 10,
-      "",
-      TEXT_STYLE
-    ).setOrigin(0.5, 0.5);
-
     this.add([button, icon]);
-    enableCountText && this.add(this.countText);
     scene.add.existing(this);
+
+    if (enableCountText) {
+      this.countText = new Phaser.GameObjects.Text(
+        scene,
+        button.width - 10,
+        button.height - 10,
+        String(this.currentCount.value),
+        TEXT_STYLE
+      ).setOrigin(0.5, 0.5);
+      this.add(this.countText);
+    }
+
+    effect(() => {
+      if (!this.currentCount.value) {
+        return;
+      }
+      this.countText.setText(String(this.currentCount.value));
+    });
+
     if (progressTime) {
       this.progress = new GaugeBar(scene, {
         max: progressTime,
@@ -126,6 +138,11 @@ export class Button extends Phaser.GameObjects.Container {
         .on("down", onKeyDown)
         .on("up", onKeyUp);
     }
+  }
+  setEnable(bool: boolean) {
+    this.setActive(bool);
+    this.setVisible(bool);
+    return this;
   }
   setTooltipText(text: string) {
     this.tooltip.buttonText.setText(text);

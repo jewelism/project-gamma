@@ -29,7 +29,7 @@ export class Bunker extends Phaser.GameObjects.Container {
     }).setPosition(0, -60);
     this.shooterGaugeBar = new GaugeBar(this.scene, {
       max: this.soldierMaxCount,
-      value: this.soldiers.getChildren().length,
+      current: this.soldiers.getChildren().length,
       color: 0x000000,
     }).setPosition(0, 20);
 
@@ -42,10 +42,10 @@ export class Bunker extends Phaser.GameObjects.Container {
   }
   protected preUpdate(_time: number, _delta: number): void {}
   isDestroyed() {
-    return !this.active || this.hpBar.value <= 0;
+    return !this.active || this.hpBar.current.value <= 0;
   }
   decreaseHealth(damage: number) {
-    this.hpBar.decrease(damage);
+    this.hpBar.current.value -= damage;
     createFlashFn()(this.sprite);
     if (!this.isDestroyed()) {
       return;
@@ -68,11 +68,9 @@ export class Bunker extends Phaser.GameObjects.Container {
   }
   upgrade() {
     this.hpRegen += 1;
-    this.hpBar.max += 10;
-    this.hpBar.value += 10;
-    this.hpBar.updateBar(this.hpBar.value);
-    this.shooterGaugeBar.max += 1;
-    this.shooterGaugeBar.updateBar(this.shooterGaugeBar.value);
+    this.hpBar.max.value += 10;
+    this.hpBar.current.value += 10;
+    this.shooterGaugeBar.max.value += 1;
   }
   hpRegenPerSec() {
     this.scene.time.addEvent({
@@ -81,11 +79,10 @@ export class Bunker extends Phaser.GameObjects.Container {
         if (this.isDestroyed()) {
           return;
         }
-        if (this.hpBar.value >= this.hpBar.max) {
+        if (this.hpBar.current.value >= this.hpBar.max.value) {
           return;
         }
-        this.hpBar.value += this.hpRegen;
-        this.hpBar.updateBar(this.hpBar.value);
+        this.hpBar.current.value += this.hpRegen;
       },
       loop: true,
     });

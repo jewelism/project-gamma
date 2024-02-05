@@ -35,7 +35,7 @@ export class Soldier extends Phaser.GameObjects.Zone {
     this.shoot();
   }
   shoot() {
-    if (!(!this.attackTimer && this.owner.hpBar.value > 0)) {
+    if (!(!this.attackTimer && this.owner.hpBar.current.value > 0)) {
       return;
     }
     const scene = this.scene as InGameScene;

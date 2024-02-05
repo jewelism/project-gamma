@@ -117,7 +117,7 @@ export class Button extends Phaser.GameObjects.Container {
     if (progressTime) {
       this.progress = new GaugeBar(scene, {
         max: progressTime,
-        value: 0,
+        current: 0,
         width: button.width,
         height: 5,
         color: 0x00ffff,
@@ -154,13 +154,13 @@ export class Button extends Phaser.GameObjects.Container {
     return this.setCountText(Number(this.countText.text) + amount);
   }
   setProgressTime(time: number) {
-    this.progress.max = time;
+    this.progress.max.value = time;
     this.progress.setAlpha(1);
     const timerEvent = this.scene.time.addEvent({
       delay: 1000, // 1초마다 실행
       callback: () => {
-        this.progress.increase(1);
-        if (this.progress.value >= this.progress.max) {
+        this.progress.current.value += 1;
+        if (this.progress.current.value >= this.progress.max.value) {
           (this.scene as InGameUIScene).uiEventBus.emit(
             `upgradeComplete`,
             this.name

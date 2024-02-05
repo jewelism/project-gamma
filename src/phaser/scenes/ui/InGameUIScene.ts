@@ -293,7 +293,7 @@ export class InGameUIScene extends Phaser.Scene {
           }
           inGameScene.bunker.soldiers.remove(soldier);
           soldier.destroy();
-          inGameScene.bunker.shooterGaugeBar.decrease(1);
+          inGameScene.bunker.shooterGaugeBar.current.value -= 1;
           this.buttonGroup.attackerState
             .getMatching("name", `grade${grade}`)
             .forEach((button: SoldierStateButton) => {
@@ -327,7 +327,7 @@ export class InGameUIScene extends Phaser.Scene {
       grade,
     });
     InGameScene.bunker.soldiers.add(soldier);
-    InGameScene.bunker.shooterGaugeBar.increase(1);
+    InGameScene.bunker.shooterGaugeBar.current.value += 1;
     new EaseText(InGameScene, {
       x: InGameScene.bunker.x - 30,
       y: InGameScene.bunker.y - 50,

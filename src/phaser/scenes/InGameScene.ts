@@ -86,7 +86,7 @@ export class InGameScene extends Phaser.Scene {
         if (index >= phaseData.length) {
           return;
         }
-        if (this.bunker.hpBar.value === 0) {
+        if (this.bunker.hpBar.current.value === 0) {
           return;
         }
         const { phase, hp, spriteKey, frameNo } = phaseData[index];

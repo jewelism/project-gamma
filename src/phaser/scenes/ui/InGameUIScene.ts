@@ -13,6 +13,7 @@ import { Soldier } from "@/phaser/objects/Soldier";
 import { EaseText } from "@/phaser/ui/EaseText";
 import { getBetweenAroundInfo } from "@/phaser/utils/helper";
 import { UIAssetLoader } from "@/phaser/scenes/ui/UIAssetLoader";
+import { effect } from "@preact/signals-core";
 
 const TAP_BUTTON = {
   height: 50,
@@ -218,6 +219,9 @@ export class InGameUIScene extends Phaser.Scene {
       })
         .setName(id)
         .setEnable(false);
+      effect(() => {
+        button.text.leftBottomText.value = UPGRADE_V2.attackDamage[id].desc;
+      });
       return button;
     };
     this.buttonGroup.attackDamage = new Phaser.GameObjects.Group(
@@ -352,7 +356,7 @@ export class InGameUIScene extends Phaser.Scene {
       }
     });
     const upgradeObj = UPGRADE_V2.attackDamage[id];
-    upgradeObj.cost += gradeStart * 10;
+    upgradeObj.cost.value += gradeStart * 10;
   }
   increaseIncome() {
     const InGameScene = this.scene.get("InGameScene") as InGameScene;

@@ -71,8 +71,6 @@ export class Button extends Phaser.GameObjects.Container {
         button.setAlpha(0.4);
         icon.setAlpha(0.4);
         if (progressTime) {
-          console.log("progressTime", progressTime);
-
           this.setProgressTime(progressTime);
           this.createProgress({ progressTime, button });
           this.add(this.progress);

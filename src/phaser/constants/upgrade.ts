@@ -13,7 +13,7 @@ export const getUpgradeTabName = (id: string) => {
 };
 function createAttackDamage(id: string, shortcutText: string) {
   const [gradeStart, gradeEnd] = getSoldierGradeById(id);
-  const cost = gradeStart * 10;
+  const cost = signal(gradeStart * 10);
   return {
     [id]: {
       current: signal(1),

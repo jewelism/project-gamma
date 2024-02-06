@@ -93,7 +93,7 @@ export const TAP_BUTTON_LIST = [
   },
   { id: "util", shortcutText: "E", desc: "util", texture: "" },
   {
-    id: "attackerState",
+    id: "unit",
     shortcutText: "R",
     desc: "units",
     texture: "sword1",

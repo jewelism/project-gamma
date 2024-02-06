@@ -49,11 +49,9 @@ export class GaugeBar extends Phaser.GameObjects.Container {
     effect(() => {
       if (this.current.value >= this.max.value) {
         this.current.value = this.max.value;
-        return;
       }
       if (this.current.value <= 0) {
         this.current.value = 0;
-        return;
       }
       this.updateBar(this.current.value);
       if (this.showText) {

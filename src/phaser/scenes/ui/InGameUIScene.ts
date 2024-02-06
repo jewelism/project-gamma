@@ -4,13 +4,13 @@ import { UI } from "@/phaser/constants";
 import { convertSecondsToMinSec } from "@/phaser/utils";
 import { Button } from "@/phaser/ui/upgrade/Button";
 import {
+  TAP_BUTTON_LIST,
   UPGRADE_V2,
   getSoldierGradeById,
   getUpgradeTabName,
 } from "@/phaser/constants/upgrade";
 import { Soldier } from "@/phaser/objects/Soldier";
 import { EaseText } from "@/phaser/ui/EaseText";
-import { SoldierStateButton } from "@/phaser/ui/upgrade/SoldierStateButton";
 import { getBetweenAroundInfo } from "@/phaser/utils/helper";
 import { UIAssetLoader } from "@/phaser/scenes/ui/UIAssetLoader";
 
@@ -84,7 +84,7 @@ export class InGameUIScene extends Phaser.Scene {
       this.buttonGroup[id].getChildren().forEach((button: Button) => {
         if (
           id.startsWith("attackerState") &&
-          Number(button.countText.text) <= 0
+          button.text.rightTopNumber.value <= 0
         ) {
           return;
         }
@@ -97,7 +97,7 @@ export class InGameUIScene extends Phaser.Scene {
     const InGameScene = this.scene.get("InGameScene") as InGameScene;
     InGameScene.resourceStates = {
       gold: new ResourceState(this, { x, y: 35, texture: "goldBar" }).increase(
-        100
+        1000
       ),
       star: new ResourceState(this, { x, y: 60, texture: "star" }),
       income: 0,
@@ -137,15 +137,11 @@ export class InGameUIScene extends Phaser.Scene {
     ]);
   }
   createBottomTap(scene: Phaser.Scene) {
-    const buttons = [
-      { id: "addSoldier", shortcutText: "Z", texture: "sword1" },
-      { id: "attackDamage", shortcutText: "X", texture: "sword1" },
-      { id: "util", shortcutText: "C", texture: "" },
-      { id: "attackerState", shortcutText: "V", texture: "sword1" },
-    ];
-    const { rectWidth, getX } = getBetweenAroundInfo(scene, buttons.length);
-
-    buttons.forEach(({ id, shortcutText, texture }, index) => {
+    const { rectWidth, getX } = getBetweenAroundInfo(
+      scene,
+      TAP_BUTTON_LIST.length
+    );
+    TAP_BUTTON_LIST.forEach(({ id, shortcutText, desc, texture }, index) => {
       const x = getX(index);
       const button = new Button(scene, {
         x,
@@ -153,7 +149,8 @@ export class InGameUIScene extends Phaser.Scene {
         width: rectWidth,
         height: 50,
         spriteKey: texture,
-        shortcutText,
+        shortcut: shortcutText,
+        leftBottomText: desc,
         onClick: () => {
           this.uiEventBus.emit(`tap`, id);
         },
@@ -175,14 +172,13 @@ export class InGameUIScene extends Phaser.Scene {
         width: rectWidth,
         height: UPGRADE_BUTTON.height,
         spriteKey,
-        tooltipText: desc,
-        shortcutText,
+        leftBottomText: desc,
+        shortcut: shortcutText,
         onClick: (progressClick) => {
           if (!this.canUpgrade({ tab: "addSoldier", id })) {
             return;
           }
-          this.increaseSoldier({ id });
-          progressClick();
+          this.increaseSoldier({ id }) && progressClick();
         },
       })
         .setName(id)
@@ -210,8 +206,8 @@ export class InGameUIScene extends Phaser.Scene {
         width: rectWidth,
         height: UPGRADE_BUTTON.height,
         spriteKey,
-        tooltipText: desc,
-        shortcutText,
+        leftBottomText: desc,
+        shortcut: shortcutText,
         onClick: (progressClick) => {
           if (!this.canUpgrade({ tab: "attackDamage", id })) {
             return;
@@ -246,8 +242,8 @@ export class InGameUIScene extends Phaser.Scene {
         width: rectWidth,
         height: UPGRADE_BUTTON.height,
         spriteKey,
-        tooltipText: desc,
-        shortcutText,
+        leftBottomText: desc,
+        shortcut: shortcutText,
         progressTime: time,
         onClick: (progressClick) => {
           if (!this.canUpgrade({ tab: "util", id })) {
@@ -276,14 +272,15 @@ export class InGameUIScene extends Phaser.Scene {
       const line = getLine(index);
       const grade = index + 1;
       const price = grade * 5;
-      const button = new SoldierStateButton(scene, {
+      const button = new Button(scene, {
         x: getX(index),
         y: line * UPGRADE_BUTTON.height + UPGRADE_BUTTON.paddingBottom * line,
         width: rectWidth,
         height: UPGRADE_BUTTON.height,
         spriteKey: "star",
-        tooltipText: `sell ★${grade} (${price}G)`,
-        gradeText: `★${grade}`,
+        leftTopText: `★${grade}`,
+        leftBottomText: `(+${price}G) sell ★${grade}`,
+        allowZero: true,
         onClick: () => {
           const soldier = inGameScene.bunker.soldiers
             .getChildren()
@@ -296,8 +293,8 @@ export class InGameUIScene extends Phaser.Scene {
           inGameScene.bunker.shooterGaugeBar.current.value -= 1;
           this.buttonGroup.attackerState
             .getMatching("name", `grade${grade}`)
-            .forEach((button: SoldierStateButton) => {
-              button.decreaseCountText();
+            .forEach((button: Button) => {
+              button.text.rightTopNumber.value -= 1;
             });
           inGameScene.resourceStates.gold.increase(price);
         },
@@ -316,10 +313,11 @@ export class InGameUIScene extends Phaser.Scene {
     const InGameScene = this.scene.get("InGameScene") as InGameScene;
     if (
       InGameScene.bunker.soldiers.getChildren().length >=
-      InGameScene.bunker.soldierMaxCount
+      InGameScene.bunker.shooterGaugeBar.max.value
     ) {
-      return;
+      return false;
     }
+
     const [gradeStart, gradeEnd] = getSoldierGradeById(id);
     const grade = Phaser.Math.Between(gradeStart, gradeEnd);
     const soldier = new Soldier(InGameScene, {
@@ -336,12 +334,13 @@ export class InGameUIScene extends Phaser.Scene {
       duration: 3000,
     }).setFontSize(20);
     this.increaseAttackersStateButton(grade);
+    return true;
   }
   increaseAttackersStateButton(grade: number) {
     const button = this.buttonGroup.attackerState
       .getChildren()
-      .find(({ name }) => name === `grade${grade}`) as SoldierStateButton;
-    button.currentCount.value += 1;
+      .find(({ name }) => name === `grade${grade}`) as Button;
+    button.text.rightTopNumber.value += 1;
   }
   increaseAttackDamage({ id }) {
     const InGameScene = this.scene.get("InGameScene") as InGameScene;

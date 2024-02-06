@@ -20,7 +20,7 @@ function createAttackDamage(id: string, shortcutText: string) {
       max: 20,
       cost,
       get desc() {
-        return `(${cost}G) ★${gradeStart}~★${gradeEnd} attack damage (+grade★)`;
+        return `(${cost}G) ★${gradeStart}~★${gradeEnd} (+grade★)`;
       },
       shortcutText,
       spriteKey: "sword1",
@@ -34,7 +34,7 @@ function createAddSoldier(id: string, shortcutText: string) {
     [id]: {
       cost,
       get desc() {
-        return `(${cost}G) add ★${gradeStart}~★${gradeEnd}`;
+        return `(${cost}G) ★${gradeStart}~★${gradeEnd}`;
       },
       shortcutText,
       spriteKey: "sword1",
@@ -43,14 +43,14 @@ function createAddSoldier(id: string, shortcutText: string) {
 }
 export const UPGRADE_V2 = {
   addSoldier: {
-    ...createAddSoldier("addSoldier1_6", "Q"),
-    ...createAddSoldier("addSoldier7_12", "W"),
-    ...createAddSoldier("addSoldier13_18", "E"),
+    ...createAddSoldier("addSoldier1_6", "A"),
+    ...createAddSoldier("addSoldier7_12", "S"),
+    ...createAddSoldier("addSoldier13_18", "D"),
   },
   attackDamage: {
-    ...createAttackDamage("attackDamage1_3", "A"),
-    ...createAttackDamage("attackDamage4_6", "S"),
-    ...createAttackDamage("attackDamage7_9", "D"),
+    ...createAttackDamage("attackDamage1_3", "F"),
+    ...createAttackDamage("attackDamage4_6", "G"),
+    ...createAttackDamage("attackDamage7_9", "H"),
   },
   util: {
     income: {
@@ -59,7 +59,7 @@ export const UPGRADE_V2 = {
       cost: 0,
       time: 120,
       get desc() {
-        return `(10%G, ${this.time}sec) increase income +0.5%`;
+        return `(10%G, ${this.time}sec) income +0.5%`;
       },
       shortcutText: "X",
       spriteKey: "book1",
@@ -70,13 +70,35 @@ export const UPGRADE_V2 = {
       cost: 10,
       time: 5,
       get desc() {
-        return `(${this.cost}G, ${this.time}sec) upgrade bunker +10HP +1Regen`;
+        return `(${this.cost}G, ${this.time}sec) upgrade bunker`;
       },
       shortcutText: "Z",
       spriteKey: "defence1",
     },
   },
 };
+
+export const TAP_BUTTON_LIST = [
+  {
+    id: "addSoldier",
+    shortcutText: "Q",
+    desc: "add unit",
+    texture: "sword1",
+  },
+  {
+    id: "attackDamage",
+    shortcutText: "W",
+    desc: "damage",
+    texture: "sword1",
+  },
+  { id: "util", shortcutText: "E", desc: "util", texture: "" },
+  {
+    id: "attackerState",
+    shortcutText: "R",
+    desc: "units",
+    texture: "sword1",
+  },
+];
 
 effect(() => {
   console.log("UPGRADE_V2 effect");

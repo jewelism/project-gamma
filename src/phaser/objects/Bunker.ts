@@ -9,7 +9,6 @@ export class Bunker extends Phaser.GameObjects.Container {
   shooterGaugeBar: GaugeBar;
   hpBar: GaugeBar;
   soldiers: Phaser.GameObjects.Group;
-  soldierMaxCount = 10;
   hpRegen = 0;
 
   constructor(scene) {
@@ -28,7 +27,7 @@ export class Bunker extends Phaser.GameObjects.Container {
       showText: true,
     }).setPosition(0, -60);
     this.shooterGaugeBar = new GaugeBar(this.scene, {
-      max: this.soldierMaxCount,
+      max: 10,
       current: this.soldiers.getChildren().length,
       color: 0x000000,
     }).setPosition(0, 20);

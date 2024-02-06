@@ -1,5 +1,5 @@
 import { UI } from "@/phaser/constants";
-import { Soldier } from "@/phaser/objects/Soldier";
+import { Unit } from "@/phaser/objects/Unit";
 
 export const createFlashFn = () => {
   return (char, tintColor = 0xff0000) => {
@@ -10,24 +10,24 @@ export const createFlashFn = () => {
   };
 };
 
-export const isOutOfRange = (soldier, target) => {
+export const isOutOfRange = (unit, target) => {
   const distance = Phaser.Math.Distance.Between(
-    soldier.x,
-    soldier.y,
+    unit.x,
+    unit.y,
     (target as any).x,
     (target as any).y
   );
-  return distance > soldier.attackRange;
+  return distance > unit.attackRange;
 };
 
-export const getAllEnemyInRange = (scene, soldier) => {
+export const getAllEnemyInRange = (scene, unit) => {
   return scene.enemies.getChildren().filter((enemy) => {
-    return !isOutOfRange(soldier, enemy);
+    return !isOutOfRange(unit, enemy);
   });
 };
 
-export const getRandomEnemyInRange = (scene, soldier: Soldier) => {
-  const targets = getAllEnemyInRange(scene, soldier);
+export const getRandomEnemyInRange = (scene, unit: Unit) => {
+  const targets = getAllEnemyInRange(scene, unit);
   if (targets.length === 0) {
     return;
   }
@@ -35,7 +35,7 @@ export const getRandomEnemyInRange = (scene, soldier: Soldier) => {
   if (!target || target?.isDestroyed()) {
     return;
   }
-  if (isOutOfRange(soldier, target)) {
+  if (isOutOfRange(unit, target)) {
     return;
   }
   return target;

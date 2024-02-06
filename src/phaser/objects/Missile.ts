@@ -1,12 +1,12 @@
 import { GAME } from "@/phaser/constants";
-import { Soldier } from "@/phaser/objects/Soldier";
+import { Unit } from "@/phaser/objects/Unit";
 import { InGameScene } from "@/phaser/scenes/InGameScene";
 import { getRandomEnemyInRange, isOutOfRange } from "@/phaser/utils/helper";
 
 export class Missile extends Phaser.Physics.Arcade.Sprite {
   static SPEED = 750;
   closestEnemy: Phaser.GameObjects.GameObject;
-  shooter: Soldier;
+  shooter: Unit;
 
   constructor(scene, { shooter }) {
     super(scene, shooter.x, shooter.y, "missile");

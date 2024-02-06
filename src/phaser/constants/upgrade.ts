@@ -1,7 +1,7 @@
 import { removeAlphabets, removeExceptAlphabets } from "@/phaser/utils";
 import { effect, signal } from "@preact/signals-core";
 
-export const getSoldierGradeById = (id: string): number[] => {
+export const getUnitGradeById = (id: string): number[] => {
   return removeAlphabets(id).split("_").map(Number);
 };
 export const getUpgradeTabName = (id: string) => {
@@ -12,7 +12,7 @@ export const getUpgradeTabName = (id: string) => {
   return removeExceptAlphabets(id);
 };
 function createAttackDamage(id: string, shortcutText: string) {
-  const [gradeStart, gradeEnd] = getSoldierGradeById(id);
+  const [gradeStart, gradeEnd] = getUnitGradeById(id);
   const cost = signal(gradeStart * 10);
   return {
     [id]: {
@@ -27,8 +27,8 @@ function createAttackDamage(id: string, shortcutText: string) {
     },
   };
 }
-function createAddSoldier(id: string, shortcutText: string) {
-  const [gradeStart, gradeEnd] = getSoldierGradeById(id);
+function createAddUnit(id: string, shortcutText: string) {
+  const [gradeStart, gradeEnd] = getUnitGradeById(id);
   const cost = gradeStart * 20;
   return {
     [id]: {
@@ -42,10 +42,10 @@ function createAddSoldier(id: string, shortcutText: string) {
   };
 }
 export const UPGRADE_V2 = {
-  addSoldier: {
-    ...createAddSoldier("addSoldier1_6", "A"),
-    ...createAddSoldier("addSoldier7_12", "S"),
-    ...createAddSoldier("addSoldier13_18", "D"),
+  addUnit: {
+    ...createAddUnit("addUnit1_6", "A"),
+    ...createAddUnit("addUnit7_12", "S"),
+    ...createAddUnit("addUnit13_18", "D"),
   },
   attackDamage: {
     ...createAttackDamage("attackDamage1_3", "F"),
@@ -80,7 +80,7 @@ export const UPGRADE_V2 = {
 
 export const TAP_BUTTON_LIST = [
   {
-    id: "addSoldier",
+    id: "addUnit",
     shortcutText: "Q",
     desc: "add unit",
     texture: "sword1",

@@ -3,10 +3,10 @@ import { convertSecondsToMinSec } from "@/phaser/utils";
 import { Button } from "@/phaser/ui/upgrade/Button";
 import {
   UPGRADE_V2,
-  getSoldierGradeById,
+  getUnitGradeById,
   getUpgradeTabName,
 } from "@/phaser/constants/upgrade";
-import { Soldier } from "@/phaser/objects/Soldier";
+import { Unit } from "@/phaser/objects/Unit";
 import { EaseText } from "@/phaser/ui/EaseText";
 import { getBetweenAroundInfo } from "@/phaser/utils/helper";
 import { UIAssetLoader } from "@/phaser/scenes/ui/UIAssetLoader";
@@ -16,7 +16,8 @@ import {
   createBottomTap,
   createBottomWrap,
 } from "@/phaser/scenes/ui/CreateBottomUI";
-import { createAddSoldierButtons } from "@/phaser/scenes/ui/CreateUpgradeButton";
+import { createAddUnitButtons } from "@/phaser/scenes/ui/CreateUpgradeButton";
+import { createUnitsTabButtons } from "@/phaser/scenes/ui/CreateUnitsTabButtons";
 
 export const UPGRADE_BUTTON = {
   height: 50,
@@ -29,7 +30,7 @@ export class InGameUIScene extends Phaser.Scene {
   upgradeButtonContainer: Phaser.GameObjects.Container;
   buttonGroup: {
     attackDamage: Phaser.GameObjects.Group;
-    addSoldier: Phaser.GameObjects.Group;
+    addUnit: Phaser.GameObjects.Group;
     util: Phaser.GameObjects.Group;
     unit: Phaser.GameObjects.Group;
   } = {} as any;
@@ -43,11 +44,11 @@ export class InGameUIScene extends Phaser.Scene {
     new CreateLeftTopUI().createResourceState(this);
     createBottomWrap.bind(this)(this);
     createBottomTap.bind(this)(this);
-    createAddSoldierButtons.bind(this)(this);
+    createAddUnitButtons.bind(this)(this);
     this.createDamageButtons(this);
     this.createUtilButtons(this);
-    this.createUnitButtons(this);
-    this.uiEventBus.emit("tab", "addSoldier");
+    createUnitsTabButtons.bind(this)(this);
+    this.uiEventBus.emit("tab", "addUnit");
     // this.createTimer(1, () => {
     //   console.log("game over");
     // });
@@ -88,7 +89,6 @@ export class InGameUIScene extends Phaser.Scene {
       });
     });
   }
-
   createDamageButtons(scene: Phaser.Scene) {
     const { rectWidth, getLine, getX } = getBetweenAroundInfo(scene, 2);
     const mapUpgradeButton = (
@@ -148,7 +148,7 @@ export class InGameUIScene extends Phaser.Scene {
           if (!this.canUpgrade({ tab: "util", id })) {
             return;
           }
-          // this.increaseSoldier({ id, button });
+          // this.increaseUnit({ id, button });
           progressClick();
         },
       })
@@ -162,56 +162,14 @@ export class InGameUIScene extends Phaser.Scene {
     );
     this.upgradeButtonContainer.add(this.buttonGroup.util.getChildren());
   }
-  createUnitButtons(scene: Phaser.Scene) {
-    const inGameScene = this.scene.get("InGameScene") as InGameScene;
-    const { rectWidth, getLine, getX } = getBetweenAroundInfo(scene, 3);
 
-    const length = 18;
-    const unitButtons = Array.from({ length }, (_, index) => {
-      const line = getLine(index);
-      const grade = index + 1;
-      const price = grade * 5;
-      const button = new Button(scene, {
-        x: getX(index),
-        y: line * UPGRADE_BUTTON.height + UPGRADE_BUTTON.paddingBottom * line,
-        width: rectWidth,
-        height: UPGRADE_BUTTON.height,
-        spriteKey: "star",
-        leftTopText: `★${grade}`,
-        leftBottomText: `(+${price}G) sell ★${grade}`,
-        allowZero: true,
-        onClick: () => {
-          const soldier = inGameScene.bunker.soldiers
-            .getChildren()
-            .find((sol: Soldier) => sol.grade === grade);
-          if (!soldier) {
-            return;
-          }
-          inGameScene.bunker.soldiers.remove(soldier);
-          soldier.destroy();
-          inGameScene.bunker.shooterGaugeBar.current.value -= 1;
-          this.buttonGroup.unit
-            .getMatching("name", `grade${grade}`)
-            .forEach((button: Button) => {
-              button.text.rightTopNumber.value -= 1;
-            });
-          inGameScene.resourceStates.gold.increase(price);
-        },
-      })
-        .setName(`grade${grade}`)
-        .setEnable(false);
-      return button;
-    });
-    this.upgradeButtonContainer.add(unitButtons);
-    this.buttonGroup.unit = new Phaser.GameObjects.Group(scene, unitButtons);
-  }
   increaseAttackDamage({ id }) {
     const InGameScene = this.scene.get("InGameScene") as InGameScene;
 
-    const [gradeStart, gradeEnd] = getSoldierGradeById(id);
-    InGameScene.bunker.soldiers.getChildren().forEach((soldier: Soldier) => {
-      if (soldier.grade >= gradeStart && soldier.grade <= gradeEnd) {
-        soldier.damage += soldier.grade;
+    const [gradeStart, gradeEnd] = getUnitGradeById(id);
+    InGameScene.bunker.units.getChildren().forEach((unit: Unit) => {
+      if (unit.grade >= gradeStart && unit.grade <= gradeEnd) {
+        unit.damage += unit.grade;
       }
     });
     const upgradeObj = UPGRADE_V2.attackDamage[id];

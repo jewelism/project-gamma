@@ -8,7 +8,7 @@ export class Bunker extends Phaser.GameObjects.Container {
   sprite: Phaser.Physics.Arcade.Sprite;
   shooterGaugeBar: GaugeBar;
   hpBar: GaugeBar;
-  soldiers: Phaser.GameObjects.Group;
+  units: Phaser.GameObjects.Group;
   hpRegen = 0;
 
   constructor(scene) {
@@ -19,7 +19,7 @@ export class Bunker extends Phaser.GameObjects.Container {
     );
 
     this.sprite = new Phaser.Physics.Arcade.Sprite(scene, 0, 0, "bunker");
-    this.soldiers = new Phaser.GameObjects.Group(scene);
+    this.units = new Phaser.GameObjects.Group(scene);
     this.hpBar = new GaugeBar(this.scene, {
       max: UPGRADE_V2.util.upgradeBunker.current.value * 10,
       width: 120,
@@ -28,7 +28,7 @@ export class Bunker extends Phaser.GameObjects.Container {
     }).setPosition(0, -60);
     this.shooterGaugeBar = new GaugeBar(this.scene, {
       max: 10,
-      current: this.soldiers.getChildren().length,
+      current: this.units.getChildren().length,
       color: 0x000000,
     }).setPosition(0, 20);
 

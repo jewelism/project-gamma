@@ -4,7 +4,7 @@ import { Missile } from "@/phaser/objects/Missile";
 import { InGameScene } from "@/phaser/scenes/InGameScene";
 import { getRandomEnemyInRange } from "@/phaser/utils/helper";
 
-export class Soldier extends Phaser.GameObjects.Zone {
+export class Unit extends Phaser.GameObjects.Zone {
   owner: Bunker;
   grade: number;
 
@@ -13,6 +13,7 @@ export class Soldier extends Phaser.GameObjects.Zone {
   attackSpeed: number;
 
   attackTimer: Phaser.Time.TimerEvent;
+  attackRangeGraphics: Phaser.GameObjects.Graphics;
 
   constructor(
     scene: Phaser.Scene,
@@ -63,10 +64,15 @@ export class Soldier extends Phaser.GameObjects.Zone {
     scene.missiles.add(missile);
   }
   drawAttackRange() {
-    const graphics = this.scene.add.graphics({
+    this.attackRangeGraphics = this.scene.add.graphics({
       lineStyle: { width: 2, color: 0xff0000 },
       fillStyle: { color: 0xff0000, alpha: 0.5 },
     });
-    graphics.strokeCircle(this.x, this.y, this.attackRange);
+    this.attackRangeGraphics.strokeCircle(this.x, this.y, this.attackRange);
+  }
+  destroy(fromScene?: boolean): void {
+    this.attackTimer?.destroy();
+    this.attackRangeGraphics?.destroy();
+    super.destroy(fromScene);
   }
 }

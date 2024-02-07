@@ -1,5 +1,5 @@
 import { removeAlphabets, removeExceptAlphabets } from "@/phaser/utils";
-import { effect, signal } from "@preact/signals-core";
+import { signal } from "@preact/signals-core";
 
 export const getUnitGradeById = (id: string): number[] => {
   return removeAlphabets(id).split("_").map(Number);
@@ -99,7 +99,3 @@ export const TAP_BUTTON_LIST = [
     texture: "sword1",
   },
 ];
-
-effect(() => {
-  console.log("UPGRADE_V2 effect");
-});

@@ -103,7 +103,6 @@ export class InGameScene extends Phaser.Scene {
         if (count === phaseData[index].count) {
           index++;
           count = 0;
-          this.resourceStates.increaseByIncome();
         }
       },
       loop: true,

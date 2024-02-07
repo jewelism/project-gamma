@@ -1,5 +1,5 @@
 import { removeAlphabets, removeExceptAlphabets } from "@/phaser/utils";
-import { signal } from "@preact/signals-core";
+import { computed, signal } from "@preact/signals-core";
 
 export const getUnitGradeById = (id: string): number[] => {
   return removeAlphabets(id).split("_").map(Number);
@@ -20,7 +20,9 @@ function createAttackDamage(id: string, shortcutText: string) {
       max: 20,
       cost,
       get desc() {
-        return `(${cost}G) ★${gradeStart}~★${gradeEnd} (+grade★)`;
+        return computed(
+          () => `(${cost.value}G) ★${gradeStart}~★${gradeEnd} (+grade★)`
+        );
       },
       shortcutText,
       spriteKey: "sword1",
@@ -29,12 +31,12 @@ function createAttackDamage(id: string, shortcutText: string) {
 }
 function createAddUnit(id: string, shortcutText: string) {
   const [gradeStart, gradeEnd] = getUnitGradeById(id);
-  const cost = gradeStart * 20;
+  const cost = signal(gradeStart * 20);
   return {
     [id]: {
       cost,
       get desc() {
-        return `(${cost}G) ★${gradeStart}~★${gradeEnd}`;
+        return computed(() => `(${cost.value}G) ★${gradeStart}~★${gradeEnd}`);
       },
       shortcutText,
       spriteKey: "sword1",
@@ -55,11 +57,21 @@ export const UPGRADE_V2 = {
   util: {
     income: {
       current: signal(1),
-      max: 50,
-      cost: 0,
-      time: 120,
+      get percent() {
+        return computed(() => this.current * 0.5);
+      },
+      get max() {
+        return computed(() => 50);
+      },
+      costPercent: 10,
+      get time() {
+        return computed(() => 30);
+      },
       get desc() {
-        return `(10%G, ${this.time}sec) income +0.5%`;
+        return computed(
+          () =>
+            `(${this.costPercent}%G, ${this.time}sec) income +0.5% (${this.percent}%)`
+        );
       },
       shortcutText: "X",
       spriteKey: "book1",
@@ -67,10 +79,20 @@ export const UPGRADE_V2 = {
     upgradeBunker: {
       current: signal(1),
       max: 15,
-      cost: 10,
-      time: 5,
+      get cost() {
+        return computed(() => {
+          return this.current * 10;
+        });
+      },
+      get time() {
+        return computed(() => {
+          return this.current.value * 5;
+        });
+      },
       get desc() {
-        return `(${this.cost}G, ${this.time}sec) upgrade bunker`;
+        return computed(
+          () => `(${this.cost}G, ${this.time}sec) upgrade bunker`
+        );
       },
       shortcutText: "Z",
       spriteKey: "defence1",

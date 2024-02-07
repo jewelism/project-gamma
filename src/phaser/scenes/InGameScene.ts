@@ -15,7 +15,6 @@ export class InGameScene extends Phaser.Scene {
   timer: Phaser.Time.TimerEvent;
   missiles: Phaser.Physics.Arcade.Group;
   resourceStates: {
-    income: number;
     gold: ResourceState;
     star: ResourceState;
     increaseByIncome: () => number;
@@ -127,7 +126,6 @@ export class InGameScene extends Phaser.Scene {
             color: "#619196",
             duration: 2500,
           }).setFontSize(18);
-          console.log("increase income");
         }
       },
       loop: true,

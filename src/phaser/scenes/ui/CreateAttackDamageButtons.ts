@@ -4,7 +4,6 @@ import { InGameScene } from "@/phaser/scenes/InGameScene";
 import { UPGRADE_BUTTON } from "@/phaser/scenes/ui/InGameUIScene";
 import { Button } from "@/phaser/ui/upgrade/Button";
 import { getBetweenAroundInfo } from "@/phaser/utils/helper";
-import { effect } from "@preact/signals-core";
 
 export function createAttackDamageButtons(scene: Phaser.Scene) {
   const { rectWidth, getLine, getX } = getBetweenAroundInfo(scene, 2);
@@ -29,9 +28,6 @@ export function createAttackDamageButtons(scene: Phaser.Scene) {
     })
       .setName(id)
       .setEnable(false);
-    effect(() => {
-      button.text.leftBottomText.value = UPGRADE_V2.attackDamage[id].desc;
-    });
     return button;
   };
   this.buttonGroup.attackDamage = new Phaser.GameObjects.Group(

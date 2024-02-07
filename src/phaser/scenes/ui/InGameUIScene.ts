@@ -60,12 +60,12 @@ export class InGameUIScene extends Phaser.Scene {
       const { resourceStates } = InGameScene;
       const upgradeObj = UPGRADE_V2[getUpgradeTabName(id)][id];
       id === "income"
-        ? resourceStates.decreaseByPercent(resourceStates.income)
+        ? resourceStates.decreaseByPercent(upgradeObj.costPercent)
         : resourceStates.decreaseByUpgrade({
             gold: upgradeObj.cost,
           });
       if (id.startsWith("income")) {
-        this.increaseIncome();
+        upgradeObj.current.value += 1;
       }
       if (id.startsWith("upgradeBunker")) {
         upgradeObj.current.value += 1;
@@ -86,10 +86,6 @@ export class InGameUIScene extends Phaser.Scene {
         button.setEnable(true);
       });
     });
-  }
-  increaseIncome() {
-    const InGameScene = this.scene.get("InGameScene") as InGameScene;
-    InGameScene.resourceStates.income += 0.05;
   }
   canUpgrade({ tab, id }) {
     const InGameScene = this.scene.get("InGameScene") as InGameScene;

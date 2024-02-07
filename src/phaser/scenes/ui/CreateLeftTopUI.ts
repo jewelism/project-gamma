@@ -1,3 +1,4 @@
+import { UPGRADE_V2 } from "@/phaser/constants/upgrade";
 import { InGameScene } from "@/phaser/scenes/InGameScene";
 import { ResourceState } from "@/phaser/ui/ResourceState";
 
@@ -11,9 +12,10 @@ export class CreateLeftTopUI {
         1000
       ),
       star: new ResourceState(scene, { x, y: 60, texture: "star" }),
-      income: 0,
       increaseByIncome() {
-        const amount = Math.floor(this.gold.value * this.income);
+        const amount = Math.floor(
+          this.gold.value * (UPGRADE_V2.util.income.percent.value / 100)
+        );
         this.gold.increase(amount);
         return amount;
       },

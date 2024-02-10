@@ -1,6 +1,11 @@
-export const getPhaseData = () => [
-  { phase: 1, hp: 1, count: 30, spriteKey: "pixel_animals", frameNo: 2 },
-  { phase: 2, hp: 3, count: 30, spriteKey: "pixel_animals", frameNo: 4 },
-  { phase: 3, hp: 10, count: 30, spriteKey: "pixel_animals", frameNo: 6 },
-  { phase: 4, hp: 20, count: 30, spriteKey: "pixel_animals", frameNo: 8 },
-];
+export const getPhaseData = () =>
+  Array.from({ length: 100 }, (_, index) => {
+    const frameNo = index > 20 ? ((index % 20) + 1) * 2 : (index + 1) * 2;
+    return {
+      phase: index + 1,
+      hp: (index + 1) * 10 - 9,
+      count: 30,
+      spriteKey: "pixel_animals",
+      frameNo,
+    };
+  });

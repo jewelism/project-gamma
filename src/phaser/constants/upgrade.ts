@@ -16,7 +16,7 @@ function createAttackDamage(id: string, shortcutText: string) {
   const cost = signal(gradeStart * 10);
   return {
     [id]: {
-      current: signal(1),
+      current: signal(0),
       max: 20,
       cost,
       get desc() {

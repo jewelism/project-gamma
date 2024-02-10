@@ -46,6 +46,9 @@ function increaseUnit({ id }) {
   ) {
     return false;
   }
+  InGameScene.resourceStates.decreaseByUpgrade({
+    gold: UPGRADE_V2.addUnit[id].cost.value,
+  });
   const [gradeStart, gradeEnd] = getUnitGradeById(id);
   const grade = Phaser.Math.Between(gradeStart, gradeEnd);
   const unit = new Unit(InGameScene, {

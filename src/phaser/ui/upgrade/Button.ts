@@ -74,11 +74,6 @@ export class Button extends Phaser.GameObjects.Container {
           this.setProgressTime(progressTime);
           this.createProgress({ progressTime, button });
           this.add(this.progress);
-        } else {
-          (scene as InGameUIScene).uiEventBus.emit(
-            `upgradeComplete`,
-            this.name
-          );
         }
       });
     };
@@ -186,7 +181,7 @@ export class Button extends Phaser.GameObjects.Container {
         this.progress.current.value += 1;
         if (this.progress.current.value >= this.progress.max.value) {
           (this.scene as InGameUIScene).uiEventBus.emit(
-            `upgradeComplete`,
+            "upgradeProgressDone",
             this.name
           );
           this.progressInUse = false;

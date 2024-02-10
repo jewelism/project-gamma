@@ -3,6 +3,7 @@ import { UPGRADE_V2 } from "@/phaser/constants/upgrade";
 import { createTitleText } from "@/phaser/phaserUtils/titleText";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { createFlashFn } from "@/phaser/utils/helper";
+import { batch, effect } from "@preact/signals-core";
 
 export class Bunker extends Phaser.GameObjects.Container {
   sprite: Phaser.Physics.Arcade.Sprite;
@@ -66,10 +67,12 @@ export class Bunker extends Phaser.GameObjects.Container {
     this.destroy();
   }
   upgrade() {
-    this.hpRegen += 1;
-    this.hpBar.max.value += 10;
-    this.hpBar.current.value += 10;
-    this.shooterGaugeBar.max.value += 1;
+    batch(() => {
+      this.hpRegen += 1;
+      this.hpBar.max.value += 10;
+      this.hpBar.current.value += 10;
+      this.shooterGaugeBar.max.value += 1;
+    });
   }
   hpRegenPerSec() {
     this.scene.time.addEvent({

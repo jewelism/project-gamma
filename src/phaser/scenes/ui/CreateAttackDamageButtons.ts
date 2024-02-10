@@ -21,6 +21,10 @@ export function createAttackDamageButtons(scene: Phaser.Scene) {
         if (!this.canUpgrade({ tab: "attackDamage", id })) {
           return;
         }
+        const InGameScene = this.scene.get("InGameScene") as InGameScene;
+        InGameScene.resourceStates.decreaseByUpgrade({
+          gold: UPGRADE_V2.attackDamage[id].cost.value,
+        });
         progressClick();
         button.text.rightTopNumber.value += 1;
         increaseAttackDamage.bind(this)({ id });

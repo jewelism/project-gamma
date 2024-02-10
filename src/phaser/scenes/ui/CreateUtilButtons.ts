@@ -23,7 +23,6 @@ export function createUtilButtons(scene: Phaser.Scene) {
         if (!this.canUpgrade({ tab: "util", id })) {
           return;
         }
-        button.text.rightTopNumber.value += 1;
         progressClick();
       },
     })

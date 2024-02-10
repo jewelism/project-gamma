@@ -55,7 +55,8 @@ export class InGameUIScene extends Phaser.Scene {
     // });
   }
   bindEventBus() {
-    this.uiEventBus.on(`upgradeComplete`, (id: string) => {
+    // progress time이 있는 업그레이드가 완료되었을때 실행됨
+    this.uiEventBus.on("upgradeProgressDone", (id: string) => {
       const InGameScene = this.scene.get("InGameScene") as InGameScene;
       const { resourceStates } = InGameScene;
       const upgradeObj = UPGRADE_V2[getUpgradeTabName(id)][id];
@@ -64,14 +65,14 @@ export class InGameUIScene extends Phaser.Scene {
         : resourceStates.decreaseByUpgrade({
             gold: upgradeObj.cost,
           });
-      if (id.startsWith("income")) {
-        upgradeObj.current.value += 1;
-      }
+      upgradeObj.current.value += 1;
+      (
+        this.upgradeButtonContainer.getByName(id) as Button
+      ).text.rightTopNumber.value += 1;
       if (id.startsWith("upgradeBunker")) {
-        upgradeObj.current.value += 1;
         InGameScene.bunker.upgrade();
       }
-      // TODO: 업그레이드 완료 사운드 재생
+      // TODO: gold가 마이너스가 되는경우가 발생하고있음
     });
     this.uiEventBus.on("tab", (id: string) => {
       Object.values(this.buttonGroup).forEach((group) => {

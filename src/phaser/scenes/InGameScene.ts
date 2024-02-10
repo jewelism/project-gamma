@@ -59,10 +59,10 @@ export class InGameScene extends Phaser.Scene {
           new EaseText(this, {
             x: (enemy as any).x,
             y: (enemy as any).y,
-            text: "+1",
+            text: `+${enemy.maxHp}`,
             color: "#619196",
           });
-          this.resourceStates.gold.increase(1);
+          this.resourceStates.gold.increase(enemy.maxHp);
         });
       }
     );
@@ -75,9 +75,9 @@ export class InGameScene extends Phaser.Scene {
     map.createLayer("bg", terrianTiles);
   }
   createEnemy() {
-    const phaseData = getPhaseData();
     let index = 0;
     let count = 0;
+    const phaseData = getPhaseData();
 
     this.timer = this.time.addEvent({
       delay: 900 / GAME.speed,

@@ -82,7 +82,7 @@ export class Button extends Phaser.GameObjects.Container {
       icon.setAlpha(1);
     };
     const button = new Phaser.GameObjects.Rectangle(scene, 0, 0, width, height)
-      .setStrokeStyle(2, 0x0000ff, 1)
+      .setStrokeStyle(2, 0x8500ff)
       .setOrigin(0, 0)
       .setInteractive()
       .on("pointerdown", () => {
@@ -167,7 +167,7 @@ export class Button extends Phaser.GameObjects.Container {
       current: 0,
       width: button.width,
       height: 5,
-      color: 0x00ffff,
+      color: 0xffadad,
     }).setPosition(button.width / 2, button.height / 2 + 10);
     return this.progress;
   }

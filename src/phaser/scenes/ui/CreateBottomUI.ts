@@ -15,8 +15,7 @@ export function createBottomWrap(scene: Phaser.Scene) {
     .rectangle(0, 0, Number(scene.scale.gameSize.width), UI.height)
     .setOrigin(0, 0)
     .setScrollFactor(0)
-    .setFillStyle(0x00ffff)
-    .setAlpha(0.5);
+    .setFillStyle(0xdedaf4);
   this.tapContainer = scene.add.container(0, 0);
   this.upgradeButtonContainer = scene.add.container(
     0,

@@ -1,4 +1,5 @@
-import { UPGRADE_V2 } from "@/phaser/constants/upgrade";
+import { UPGRADE_V2, getUpgradeTabName } from "@/phaser/constants/upgrade";
+import { InGameScene } from "@/phaser/scenes/InGameScene";
 import { UPGRADE_BUTTON } from "@/phaser/scenes/ui/InGameUIScene";
 import { Button } from "@/phaser/ui/upgrade/Button";
 import { getBetweenAroundInfo } from "@/phaser/utils/helper";
@@ -22,6 +23,13 @@ export function createUtilButtons(scene: Phaser.Scene) {
       onClick: (progressClick) => {
         if (!this.canUpgrade({ tab: "util", id })) {
           return;
+        }
+        if (id !== "income") {
+          const resourceStates = (scene.scene.get("InGameScene") as InGameScene)
+            .resourceStates;
+          resourceStates.decreaseByUpgrade({
+            gold: UPGRADE_V2[getUpgradeTabName(id)][id].cost,
+          });
         }
         progressClick();
       },

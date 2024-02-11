@@ -40,7 +40,7 @@ export class ResourceState extends Phaser.GameObjects.Container {
     scene.add.existing(this);
 
     effect(() => {
-      this.text.setText(String(this.value.value));
+      this.text.setText(String(this.value));
     });
   }
   increase(amount: number) {

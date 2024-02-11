@@ -61,15 +61,20 @@ export class InGameUIScene extends Phaser.Scene {
       const InGameScene = this.scene.get("InGameScene") as InGameScene;
       const { resourceStates } = InGameScene;
       const upgradeObj = UPGRADE_V2[getUpgradeTabName(id)][id];
-      id === "income"
-        ? resourceStates.decreaseByPercent(upgradeObj.costPercent)
-        : resourceStates.decreaseByUpgrade({
-            gold: upgradeObj.cost,
-          });
       upgradeObj.current.value += 1;
       (
         this.upgradeButtonContainer.getByName(id) as Button
       ).text.rightTopNumber.value += 1;
+      if (id === "income") {
+        const amount = resourceStates.decreaseByPercent(upgradeObj.costPercent);
+        new EaseText(this, {
+          x: InGameScene.bunker.x,
+          y: InGameScene.bunker.y,
+          text: `income upgrade -${amount}G`,
+          color: "#619196",
+          duration: 2000,
+        }).setFontSize(20);
+      }
       if (id.startsWith("upgradeBunker")) {
         InGameScene.bunker.upgrade();
       }

@@ -19,7 +19,7 @@ export class InGameScene extends Phaser.Scene {
     star: ResourceState;
     increaseByIncome: () => number;
     decreaseByUpgrade: (payload: { gold?: number; star?: number }) => void;
-    decreaseByPercent: (percent: number) => void;
+    decreaseByPercent: (percent: number) => number;
   };
 
   constructor() {

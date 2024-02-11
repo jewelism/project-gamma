@@ -109,14 +109,10 @@ export const UPGRADE_V2 = {
       current: signal(1),
       max: 15,
       get cost() {
-        return computed(() => {
-          return this.current * 10;
-        });
+        return computed(() => this.current * 10);
       },
       get time() {
-        return computed(() => {
-          return this.current.value * 5;
-        });
+        return computed(() => this.current.value * 5);
       },
       get desc() {
         return computed(

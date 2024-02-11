@@ -5,8 +5,7 @@ export const getUnitGradeById = (id: string): number[] => {
   return removeAlphabets(id).split("_").map(Number);
 };
 export const getUpgradeTabName = (id: string) => {
-  const lowId = id.toLowerCase();
-  if (lowId.includes("bunker") || lowId.includes("income")) {
+  if (Object.keys(UPGRADE_V2.util).includes(id)) {
     return "util";
   }
   return removeExceptAlphabets(id);
@@ -55,6 +54,36 @@ export const UPGRADE_V2 = {
     ...createAttackDamage("attackDamage7_9", "H"),
   },
   util: {
+    // TODO: 보스만들기. 보스잡고 얻은 별로 할수있는거 만들기.
+    // 게임 끝나고 메뉴에서 별도 보상 업그레이드?
+    gamble: {
+      current: signal(1),
+      max: 10,
+      get cost() {
+        return computed(() => this.current * 50);
+      },
+      get rewardMin() {
+        return computed(() => Math.round(this.cost / 20));
+      },
+      get rewardMax() {
+        return computed(() => this.cost * 2);
+      },
+      get reward() {
+        return computed(() =>
+          Phaser.Math.Between(this.rewardMin, this.rewardMax)
+        );
+      },
+      get time() {
+        return computed(() => 1);
+      },
+      get desc() {
+        return computed(
+          () => `(${this.cost}G) (${this.rewardMin}~${this.rewardMax}G) gamble`
+        );
+      },
+      shortcutText: "C",
+      spriteKey: "sword1",
+    },
     income: {
       current: signal(1),
       get percent() {

@@ -19,6 +19,7 @@ import { createAddUnitButtons } from "@/phaser/scenes/ui/CreateAddUnitButtons";
 import { createUnitsTabButtons } from "@/phaser/scenes/ui/CreateUnitsTabButtons";
 import { createAttackDamageButtons } from "@/phaser/scenes/ui/CreateAttackDamageButtons";
 import { createUtilButtons } from "@/phaser/scenes/ui/CreateUtilButtons";
+import { EaseText } from "@/phaser/ui/EaseText";
 
 export const UPGRADE_BUTTON = {
   height: 50,
@@ -71,6 +72,18 @@ export class InGameUIScene extends Phaser.Scene {
       ).text.rightTopNumber.value += 1;
       if (id.startsWith("upgradeBunker")) {
         InGameScene.bunker.upgrade();
+      }
+      if (id === "gamble") {
+        resourceStates.gold.value.value += Number(
+          UPGRADE_V2.util.gamble.reward
+        );
+        new EaseText(this, {
+          x: InGameScene.bunker.x,
+          y: InGameScene.bunker.y,
+          text: `gamble +${UPGRADE_V2.util.gamble.reward}G`,
+          color: "#619196",
+          duration: 2000,
+        }).setFontSize(20);
       }
       // TODO: gold가 마이너스가 되는경우가 발생하고있음
     });

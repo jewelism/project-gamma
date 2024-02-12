@@ -58,7 +58,7 @@ export const UPGRADE_V2 = {
     // 게임 끝나고 메뉴에서 별도 보상 업그레이드?
     gamble: {
       current: signal(1),
-      max: 10,
+      max: 100,
       get cost() {
         return computed(() => this.current * 50);
       },

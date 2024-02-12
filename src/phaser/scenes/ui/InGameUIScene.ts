@@ -87,13 +87,12 @@ export class InGameUIScene extends Phaser.Scene {
         InGameScene.bunker.upgrade();
       }
       if (id === "gamble") {
-        resourceStates.gold.value.value += Number(
-          UPGRADE_V2.util.gamble.reward
-        );
+        const reward = Number(UPGRADE_V2.util.gamble.reward);
+        resourceStates.gold.increase(reward);
         new EaseText(this, {
           x: InGameScene.bunker.x,
           y: InGameScene.bunker.y,
-          text: `gamble +${UPGRADE_V2.util.gamble.reward}G`,
+          text: `gamble +${reward}G`,
           color: "#619196",
           duration: 2000,
         }).setFontSize(20);

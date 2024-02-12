@@ -1,13 +1,7 @@
 import { InGameScene } from "@/phaser/scenes/InGameScene";
 import { convertSecondsToMinSec } from "@/phaser/utils";
 import { Button } from "@/phaser/ui/upgrade/Button";
-import {
-  UPGRADE_V2,
-  getUnitGradeById,
-  getUpgradeTabName,
-} from "@/phaser/constants/upgrade";
-import { Unit } from "@/phaser/objects/Unit";
-import { getBetweenAroundInfo } from "@/phaser/utils/helper";
+import { UPGRADE_V2, getUpgradeTabName } from "@/phaser/constants/upgrade";
 import { UIAssetLoader } from "@/phaser/scenes/ui/UIAssetLoader";
 import { effect } from "@preact/signals-core";
 import { CreateLeftTopUI } from "@/phaser/scenes/ui/CreateLeftTopUI";
@@ -54,6 +48,20 @@ export class InGameUIScene extends Phaser.Scene {
     // this.createTimer(1, () => {
     //   console.log("game over");
     // });
+    effect(() => {
+      const { resourceStates } = this.scene.get("InGameScene") as InGameScene;
+      resourceStates.gold.value.value;
+      Object.values(this.buttonGroup).forEach((group) => {
+        group.getChildren().forEach((button: Button) => {
+          if (button.name.startsWith("grade")) {
+            return;
+          }
+          const cost =
+            UPGRADE_V2[getUpgradeTabName(button.name)][button.name].cost?.value;
+          button.disabled.value = resourceStates.gold.value.value < cost;
+        });
+      });
+    });
   }
   bindEventBus() {
     // progress time이 있는 업그레이드가 완료되었을때 실행됨
@@ -105,18 +113,6 @@ export class InGameUIScene extends Phaser.Scene {
         button.setEnable(true);
       });
     });
-  }
-  canUpgrade({ tab, id }) {
-    const InGameScene = this.scene.get("InGameScene") as InGameScene;
-    const { resourceStates } = InGameScene;
-    if (
-      resourceStates.gold.value.value < UPGRADE_V2[tab][id].cost ||
-      UPGRADE_V2[tab][id].value >= UPGRADE_V2[tab][id].max
-    ) {
-      // TODO: 업그레이드 불가능한 경우 버저를 울린다.
-      return false;
-    }
-    return true;
   }
   createTimer(min: number, callback: () => void) {
     let remainingTime = min * 60;

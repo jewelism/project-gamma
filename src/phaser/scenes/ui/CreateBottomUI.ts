@@ -48,4 +48,5 @@ export function createBottomTap(scene: Phaser.Scene) {
     });
     this.tapContainer.add(button);
   });
+  // TODO: 탭 아래 버튼들 영역 스크롤 가능하게 만들기
 }

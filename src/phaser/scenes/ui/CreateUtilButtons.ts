@@ -21,7 +21,7 @@ export function createUtilButtons(scene: Phaser.Scene) {
       shortcut: shortcutText,
       progressTime: time,
       onClick: (progressClick) => {
-        if (!this.canUpgrade({ tab: "util", id })) {
+        if (button.progressInUse) {
           return;
         }
         if (id !== "income") {

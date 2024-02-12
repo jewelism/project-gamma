@@ -20,9 +20,6 @@ export function createAddUnitButtons(scene: Phaser.Scene) {
       leftBottomText: desc,
       shortcut: shortcutText,
       onClick: (progressClick) => {
-        if (!this.canUpgrade({ tab: "addUnit", id })) {
-          return;
-        }
         increaseUnit.bind(this)({ id }) && progressClick();
       },
     })

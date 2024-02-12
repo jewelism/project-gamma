@@ -18,9 +18,6 @@ export function createAttackDamageButtons(scene: Phaser.Scene) {
       leftBottomText: desc,
       shortcut: shortcutText,
       onClick: (progressClick) => {
-        if (!this.canUpgrade({ tab: "attackDamage", id })) {
-          return;
-        }
         const InGameScene = this.scene.get("InGameScene") as InGameScene;
         InGameScene.resourceStates.decreaseByUpgrade({
           gold: UPGRADE_V2.attackDamage[id].cost.value,

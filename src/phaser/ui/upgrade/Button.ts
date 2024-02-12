@@ -17,6 +17,7 @@ export class Button extends Phaser.GameObjects.Container {
     rightBottomText: signal(""),
   };
   progressInUse: boolean = false;
+  disabled: Signal<boolean> = signal(false);
 
   constructor(
     scene: Phaser.Scene,
@@ -61,6 +62,9 @@ export class Button extends Phaser.GameObjects.Container {
       if (!onClick) {
         return;
       }
+      if (this.disabled.value) {
+        return;
+      }
       if (!this.active) {
         return;
       }
@@ -71,6 +75,7 @@ export class Button extends Phaser.GameObjects.Container {
         button.setAlpha(0.4);
         icon.setAlpha(0.4);
         if (progressTime) {
+          this.progressInUse = true;
           this.setProgressTime(progressTime);
           this.createProgress({ progressTime, button });
           this.add(this.progress);
@@ -130,6 +135,10 @@ export class Button extends Phaser.GameObjects.Container {
         }
         text.setText(String(sig.value));
       });
+      effect(() => {
+        button.setAlpha(this.disabled.value ? 0.2 : 1);
+        text.setAlpha(this.disabled.value ? 0.2 : 1);
+      });
     });
 
     effect(() => {
@@ -174,7 +183,6 @@ export class Button extends Phaser.GameObjects.Container {
   setProgressTime(time: number) {
     this.progress.max.value = time;
     this.progress.setAlpha(1);
-    this.progressInUse = true;
     const timerEvent = this.scene.time.addEvent({
       delay: 1000, // 1초마다 실행
       callback: () => {

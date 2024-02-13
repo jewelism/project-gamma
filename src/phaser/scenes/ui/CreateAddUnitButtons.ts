@@ -7,8 +7,9 @@ import { Button } from "@/phaser/ui/upgrade/Button";
 import { getBetweenAroundInfo } from "@/phaser/utils/helper";
 
 export function createAddUnitButtons(scene: Phaser.Scene) {
-  const { rectWidth, getLine, getX } = getBetweenAroundInfo(scene, 2);
-  const mapUpgradeButton = ([id, { spriteKey, desc, shortcutText }], index) => {
+  const { rectWidth, getLine, getX } = getBetweenAroundInfo(scene, 1);
+  const mapUpgradeButton = ([id, { spriteKey, desc }], index) => {
+    // const mapUpgradeButton = ([id, { spriteKey, desc, shortcutText }], index) => {
     const line = getLine(index);
 
     const button = new Button(scene, {
@@ -18,7 +19,7 @@ export function createAddUnitButtons(scene: Phaser.Scene) {
       height: UPGRADE_BUTTON.height,
       spriteKey,
       leftBottomText: desc,
-      shortcut: shortcutText,
+      // shortcut: shortcutText,
       onClick: (progressClick) => {
         increaseUnit.bind(this)({ id }) && progressClick();
       },

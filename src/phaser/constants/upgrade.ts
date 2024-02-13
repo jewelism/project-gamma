@@ -10,49 +10,52 @@ export const getUpgradeTabName = (id: string) => {
   }
   return removeExceptAlphabets(id);
 };
-function createAttackDamage(id: string, shortcutText: string) {
-  const [gradeStart, gradeEnd] = getUnitGradeById(id);
-  const cost = signal(gradeStart * 10);
+function createAttackDamage(id: string) {
+  const [gradeStart] = getUnitGradeById(id);
+  const cost = signal(gradeStart * 20);
   return {
     [id]: {
       current: signal(0),
       max: 20,
       cost,
       get desc() {
-        return computed(
-          () => `(${cost.value}G) ★${gradeStart}~★${gradeEnd} (+grade★)`
-        );
+        return computed(() => `(${cost.value}G) ★${gradeStart}`);
       },
-      shortcutText,
       spriteKey: "sword1",
     },
   };
 }
-function createAddUnit(id: string, shortcutText: string) {
+function createAddUnit(id: string) {
+  // function createAddUnit(id: string, shortcutText: string) {
   const [gradeStart, gradeEnd] = getUnitGradeById(id);
-  const cost = signal(gradeStart * 20);
+  const cost = signal(gradeStart * 50);
   return {
     [id]: {
       cost,
       get desc() {
         return computed(() => `(${cost.value}G) ★${gradeStart}~★${gradeEnd}`);
       },
-      shortcutText,
+      // shortcutText,
       spriteKey: "sword1",
     },
   };
 }
+const addUnit = Array.from(
+  { length: 5 },
+  (_, i) => `addUnit${i * 4 + 1}_${i * 4 + 4}`
+).reduce((acc, key) => {
+  return { ...acc, ...createAddUnit(key) };
+}, {});
+const attackDamage = Array.from(
+  { length: 20 },
+  (_, i) => `attackDamage${i + 1}`
+).reduce((acc, key) => {
+  return { ...acc, ...createAttackDamage(key) };
+}, {});
+
 export const UPGRADE_V2 = {
-  addUnit: {
-    ...createAddUnit("addUnit1_6", "A"),
-    ...createAddUnit("addUnit7_12", "S"),
-    ...createAddUnit("addUnit13_18", "D"),
-  },
-  attackDamage: {
-    ...createAttackDamage("attackDamage1_3", "F"),
-    ...createAttackDamage("attackDamage4_6", "G"),
-    ...createAttackDamage("attackDamage7_9", "H"),
-  },
+  addUnit,
+  attackDamage,
   util: {
     // TODO: 보스만들기. 보스잡고 얻은 별로 할수있는거 만들기.
     // 게임 끝나고 메뉴에서 별도 보상 업그레이드?

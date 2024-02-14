@@ -26,7 +26,7 @@ export class Unit extends Phaser.GameObjects.Zone {
 
     this.damage = 1 * this.grade;
     this.attackRange = 100 + this.grade * 10;
-    this.attackSpeed = 2000 - this.grade * 100;
+    this.attackSpeed = 2000 - this.grade * 10;
 
     scene.add.existing(this);
 

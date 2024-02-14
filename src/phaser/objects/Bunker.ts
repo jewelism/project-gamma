@@ -3,7 +3,7 @@ import { UPGRADE_V2 } from "@/phaser/constants/upgrade";
 import { createTitleText } from "@/phaser/phaserUtils/titleText";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { createFlashFn } from "@/phaser/utils/helper";
-import { batch, effect } from "@preact/signals-core";
+import { batch } from "@preact/signals-core";
 
 export class Bunker extends Phaser.GameObjects.Container {
   sprite: Phaser.Physics.Arcade.Sprite;
@@ -22,7 +22,7 @@ export class Bunker extends Phaser.GameObjects.Container {
     this.sprite = new Phaser.Physics.Arcade.Sprite(scene, 0, 0, "bunker");
     this.units = new Phaser.GameObjects.Group(scene);
     this.hpBar = new GaugeBar(this.scene, {
-      max: UPGRADE_V2.util.upgradeBunker.current.value * 10,
+      max: UPGRADE_V2.util.upgradeBunker.current.value * 20,
       width: 120,
       height: 16,
       showText: true,

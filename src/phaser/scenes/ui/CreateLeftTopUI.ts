@@ -24,8 +24,8 @@ export class CreateLeftTopUI {
         star && this.star.decrease(star);
       },
       decreaseByPercent(percent: number) {
-        const amount = Math.floor(this.gold.value * percent);
-        this.gold.decrease(Math.floor(this.gold.value * percent));
+        const amount = Math.floor((this.gold.value * percent) / 100);
+        this.gold.decrease(Math.floor((this.gold.value * percent) / 100));
         return amount;
       },
     };

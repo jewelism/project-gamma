@@ -28,7 +28,7 @@ function createAttackDamage(id: string) {
 function createAddUnit(id: string) {
   // function createAddUnit(id: string, shortcutText: string) {
   const [gradeStart, gradeEnd] = getUnitGradeById(id);
-  const cost = signal(gradeStart * 50);
+  const cost = signal(gradeStart ** 4 + gradeStart * 20);
   return {
     [id]: {
       cost,

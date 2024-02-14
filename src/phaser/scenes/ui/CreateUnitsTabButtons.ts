@@ -8,7 +8,7 @@ export function createUnitsTabButtons(scene: Phaser.Scene) {
   const inGameScene = this.scene.get("InGameScene") as InGameScene;
   const { rectWidth, getLine, getX } = getBetweenAroundInfo(scene, 3);
 
-  const length = 18;
+  const length = 15;
   const unitButtons = Array.from({ length }, (_, index) => {
     const line = getLine(index);
     const grade = index + 1;

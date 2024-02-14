@@ -6,7 +6,7 @@ import { Button } from "@/phaser/ui/upgrade/Button";
 import { getBetweenAroundInfo } from "@/phaser/utils/helper";
 
 export function createAttackDamageButtons(scene: Phaser.Scene) {
-  const { rectWidth, getLine, getX } = getBetweenAroundInfo(scene, 4);
+  const { rectWidth, getLine, getX } = getBetweenAroundInfo(scene, 1);
   const mapUpgradeButton = ([id, { spriteKey, desc }], index) => {
     const line = getLine(index);
     const button = new Button(scene, {

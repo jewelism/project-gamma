@@ -11,7 +11,7 @@ export const getUpgradeTabName = (id: string) => {
   return removeExceptAlphabets(id);
 };
 function createAttackDamage(id: string) {
-  const [gradeStart] = getUnitGradeById(id);
+  const [gradeStart, gradeEnd] = getUnitGradeById(id);
   const cost = signal(gradeStart * 20);
   return {
     [id]: {
@@ -19,7 +19,7 @@ function createAttackDamage(id: string) {
       max: 20,
       cost,
       get desc() {
-        return computed(() => `(${cost.value}G) ★${gradeStart}`);
+        return computed(() => `(${cost.value}G) ★${gradeStart}~${gradeEnd}`);
       },
       spriteKey: "sword1",
     },
@@ -33,22 +33,25 @@ function createAddUnit(id: string) {
     [id]: {
       cost,
       get desc() {
-        return computed(() => `(${cost.value}G) ★${gradeStart}~★${gradeEnd}`);
+        if (gradeEnd) {
+          return computed(() => `(${cost.value}G) ★${gradeStart}~★${gradeEnd}`);
+        }
+        return computed(() => `(${cost.value}G) ★${gradeStart}`);
       },
       // shortcutText,
       spriteKey: "sword1",
     },
   };
 }
-const addUnit = Array.from(
-  { length: 5 },
-  (_, i) => `addUnit${i * 4 + 1}_${i * 4 + 4}`
-).reduce((acc, key) => {
-  return { ...acc, ...createAddUnit(key) };
-}, {});
+const addUnit = Array.from({ length: 15 }, (_, i) => `addUnit${i + 1}`).reduce(
+  (acc, key) => {
+    return { ...acc, ...createAddUnit(key) };
+  },
+  {}
+);
 const attackDamage = Array.from(
-  { length: 20 },
-  (_, i) => `attackDamage${i + 1}`
+  { length: 5 },
+  (_, i) => `attackDamage${i + 1}_${(i + 1) * 3}`
 ).reduce((acc, key) => {
   return { ...acc, ...createAttackDamage(key) };
 }, {});

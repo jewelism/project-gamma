@@ -7,7 +7,7 @@ import { Button } from "@/phaser/ui/upgrade/Button";
 import { getBetweenAroundInfo } from "@/phaser/utils/helper";
 
 export function createAddUnitButtons(scene: Phaser.Scene) {
-  const { rectWidth, getLine, getX } = getBetweenAroundInfo(scene, 1);
+  const { rectWidth, getLine, getX } = getBetweenAroundInfo(scene, 3);
   const mapUpgradeButton = ([id, { spriteKey, desc }], index) => {
     // const mapUpgradeButton = ([id, { spriteKey, desc, shortcutText }], index) => {
     const line = getLine(index);
@@ -48,7 +48,9 @@ function increaseUnit({ id }) {
     gold: UPGRADE_V2.addUnit[id].cost.value,
   });
   const [gradeStart, gradeEnd] = getUnitGradeById(id);
-  const grade = Phaser.Math.Between(gradeStart, gradeEnd);
+  let grade = Phaser.Math.Between(gradeStart, gradeEnd);
+  !gradeEnd && (grade = gradeStart);
+
   const unit = new Unit(InGameScene, {
     owner: InGameScene.bunker,
     grade,

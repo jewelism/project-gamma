@@ -58,8 +58,7 @@ function increaseUnit({ id }) {
   InGameScene.bunker.units.add(unit);
   InGameScene.bunker.shooterGaugeBar.current.value += 1;
   new EaseText(InGameScene, {
-    x: InGameScene.bunker.x - 30,
-    y: InGameScene.bunker.y - 50,
+    ...InGameScene.bunker.centerXY(),
     text: `+★${grade}`,
     color: "#ff0000",
     duration: 3000,

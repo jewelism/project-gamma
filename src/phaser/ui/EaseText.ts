@@ -15,6 +15,7 @@ export class EaseText extends Phaser.GameObjects.Text {
       color,
     });
 
+    this.setOrigin(0.5);
     this.duration = duration;
 
     scene.add.existing(this);

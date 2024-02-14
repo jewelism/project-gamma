@@ -76,8 +76,7 @@ export class InGameUIScene extends Phaser.Scene {
       if (id === "income") {
         const amount = resourceStates.decreaseByPercent(upgradeObj.costPercent);
         new EaseText(this, {
-          x: InGameScene.bunker.x,
-          y: InGameScene.bunker.y,
+          ...InGameScene.bunker.centerXY(),
           text: `income upgrade -${amount}G`,
           color: "#619196",
           duration: 2000,
@@ -90,8 +89,7 @@ export class InGameUIScene extends Phaser.Scene {
         const reward = Number(UPGRADE_V2.util.gamble.reward);
         resourceStates.gold.increase(reward);
         new EaseText(this, {
-          x: InGameScene.bunker.x,
-          y: InGameScene.bunker.y,
+          ...InGameScene.bunker.centerXY(),
           text: `gamble +${reward}G`,
           color: "#619196",
           duration: 2000,

@@ -89,4 +89,7 @@ export class Bunker extends Phaser.GameObjects.Container {
       loop: true,
     });
   }
+  centerXY() {
+    return { x: this.x, y: this.y - 100 };
+  }
 }

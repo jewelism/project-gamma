@@ -80,8 +80,7 @@ export class InGameScene extends Phaser.Scene {
     const phaseData = getPhaseData();
 
     new EaseText(this, {
-      x: this.bunker.x,
-      y: this.bunker.y - 50,
+      ...this.bunker.centerXY(),
       text: "Phase 1",
       color: "#619196",
       duration: 5000,
@@ -110,8 +109,7 @@ export class InGameScene extends Phaser.Scene {
           index++;
           count = 0;
           new EaseText(this, {
-            x: this.bunker.x,
-            y: this.bunker.y - 50,
+            ...this.bunker.centerXY(),
             text: `Phase ${index + 1}`,
             color: "#619196",
             duration: 2000,
@@ -134,8 +132,7 @@ export class InGameScene extends Phaser.Scene {
             return;
           }
           new EaseText(this, {
-            x: this.bunker.x + 50,
-            y: this.bunker.y,
+            ...this.bunker.centerXY(),
             text: `+${amount} income`,
             color: "#619196",
             duration: 2500,

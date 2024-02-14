@@ -12,7 +12,7 @@ export const getUpgradeTabName = (id: string) => {
 };
 function createAttackDamage(id: string) {
   const [gradeStart, gradeEnd] = getUnitGradeById(id);
-  const cost = signal(gradeStart * 20);
+  const cost = signal(gradeStart ** 4 + gradeStart * 20);
   return {
     [id]: {
       current: signal(0),
@@ -100,7 +100,7 @@ export const UPGRADE_V2 = {
       },
       costPercent: 10,
       get time() {
-        return computed(() => 30);
+        return computed(() => 60);
       },
       get desc() {
         return computed(

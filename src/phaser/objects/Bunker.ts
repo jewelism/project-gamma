@@ -69,8 +69,8 @@ export class Bunker extends Phaser.GameObjects.Container {
   upgrade() {
     batch(() => {
       this.hpRegen += 1;
-      this.hpBar.max.value += 10;
-      this.hpBar.current.value += 10;
+      this.hpBar.max.value += 20;
+      this.hpBar.current.value += 20;
       this.shooterGaugeBar.max.value += 1;
     });
   }

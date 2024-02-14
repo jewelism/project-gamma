@@ -47,5 +47,5 @@ function increaseAttackDamage({ id }) {
   });
   const upgradeObj = UPGRADE_V2.attackDamage[id];
   upgradeObj.current.value += 1;
-  upgradeObj.cost.value += gradeStart * 10;
+  upgradeObj.cost.value *= 2;
 }

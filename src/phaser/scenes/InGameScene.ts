@@ -79,6 +79,13 @@ export class InGameScene extends Phaser.Scene {
     let count = 0;
     const phaseData = getPhaseData();
 
+    new EaseText(this, {
+      x: this.bunker.x,
+      y: this.bunker.y - 50,
+      text: "Phase 1",
+      color: "#619196",
+      duration: 5000,
+    }).setFontSize(20);
     this.timer = this.time.addEvent({
       delay: 900 / GAME.speed,
       callback: () => {
@@ -88,7 +95,7 @@ export class InGameScene extends Phaser.Scene {
         if (this.bunker.hpBar.current.value === 0) {
           return;
         }
-        const { phase, hp, spriteKey, frameNo } = phaseData[index];
+        const { phase, spriteKey, frameNo } = phaseData[index];
         const [x, y] = getEnemyRandomDirectionXY(this);
         const enemy = new Enemy(this, {
           x,
@@ -102,6 +109,13 @@ export class InGameScene extends Phaser.Scene {
         if (count === phaseData[index].count) {
           index++;
           count = 0;
+          new EaseText(this, {
+            x: this.bunker.x,
+            y: this.bunker.y - 50,
+            text: `Phase ${index + 1}`,
+            color: "#619196",
+            duration: 2000,
+          }).setFontSize(20);
         }
       },
       loop: true,

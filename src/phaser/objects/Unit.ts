@@ -1,7 +1,9 @@
 import { GAME } from "@/phaser/constants";
 import { Bunker } from "@/phaser/objects/Bunker";
+import { Enemy } from "@/phaser/objects/Enemy";
 import { Missile } from "@/phaser/objects/Missile";
 import { InGameScene } from "@/phaser/scenes/InGameScene";
+import { EaseText } from "@/phaser/ui/EaseText";
 import { getRandomEnemyInRange } from "@/phaser/utils/helper";
 
 export class Unit extends Phaser.GameObjects.Zone {
@@ -14,6 +16,7 @@ export class Unit extends Phaser.GameObjects.Zone {
 
   attackTimer: Phaser.Time.TimerEvent;
   attackRangeGraphics: Phaser.GameObjects.Graphics;
+  missiles: Phaser.Physics.Arcade.Group;
 
   constructor(
     scene: Phaser.Scene,
@@ -27,6 +30,26 @@ export class Unit extends Phaser.GameObjects.Zone {
     this.damage = 1 * this.grade;
     this.attackRange = 100 + this.grade * 10;
     this.attackSpeed = 2000 - this.grade * 10;
+
+    this.missiles = this.scene.physics.add.group();
+    this.scene.physics.add.overlap(
+      (this.scene as InGameScene).enemies,
+      this.missiles,
+      (_enemy, _missile) => {
+        const enemy = _enemy as Enemy;
+        const missile = _missile as Missile;
+        missile.destroy();
+        enemy.decreaseHp(missile.shooter.damage, () => {
+          new EaseText(this.scene, {
+            x: (enemy as any).x,
+            y: (enemy as any).y,
+            text: `+${enemy.maxHp}`,
+            color: "#619196",
+          });
+          (this.scene as InGameScene).resourceStates.gold.increase(enemy.maxHp);
+        });
+      }
+    );
 
     scene.add.existing(this);
 
@@ -61,7 +84,7 @@ export class Unit extends Phaser.GameObjects.Zone {
     const missile = new Missile(scene, {
       shooter: this,
     });
-    scene.missiles.add(missile);
+    this.missiles.add(missile);
   }
   drawAttackRange() {
     this.attackRangeGraphics = this.scene.add.graphics({

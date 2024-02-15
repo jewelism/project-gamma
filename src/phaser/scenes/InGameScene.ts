@@ -5,7 +5,7 @@ import { Bunker } from "@/phaser/objects/Bunker";
 import { Enemy } from "@/phaser/objects/Enemy";
 import { Missile } from "@/phaser/objects/Missile";
 import { EaseText } from "@/phaser/ui/EaseText";
-import { ResourceState } from "@/phaser/ui/ResourceState";
+import { ResourceStatesType } from "@/phaser/ui/ResourceState";
 import { getEnemyRandomDirectionXY } from "@/phaser/utils/helper";
 
 export class InGameScene extends Phaser.Scene {
@@ -13,29 +13,8 @@ export class InGameScene extends Phaser.Scene {
   bunker: Bunker;
   enemies: Phaser.Physics.Arcade.Group;
   timer: Phaser.Time.TimerEvent;
-  missiles: Phaser.Physics.Arcade.Group;
-  resourceStates: {
-    gold: ResourceState;
-    star: ResourceState;
-    increaseByIncome: () => number;
-    decreaseByUpgrade: (payload: { gold?: number; star?: number }) => void;
-    decreaseByPercent: (percent: number) => number;
-  };
+  resourceStates: ResourceStatesType;
 
-  constructor() {
-    super("InGameScene");
-    this.eventBus = new Phaser.Events.EventEmitter();
-  }
-  preload() {
-    this.load.tilemapTiledJSON("map", "assets/tiled/map.json");
-    this.load.image("Terrian", "assets/tiled/Tile1.0.1/Terrian.png");
-    this.load.image("bunker", "assets/bunker_100x100.png");
-    this.load.image("missile", "assets/bullet_8x8.png");
-    this.load.spritesheet("pixel_animals", "assets/pixel_animals.png", {
-      frameWidth: 16,
-      frameHeight: 16,
-    });
-  }
   create() {
     this.scene.launch("InGameUIScene");
     // createTitleText(this, "Select Level", 100);
@@ -44,28 +23,8 @@ export class InGameScene extends Phaser.Scene {
     this.bunker = new Bunker(this);
 
     this.enemies = this.physics.add.group();
-    this.missiles = this.physics.add.group();
     this.createEnemy();
     this.createIncome();
-
-    this.physics.add.overlap(
-      this.enemies,
-      this.missiles,
-      (_enemy, _missile) => {
-        const enemy = _enemy as Enemy;
-        const missile = _missile as Missile;
-        missile.destroy();
-        enemy.decreaseHp(missile.shooter.damage, () => {
-          new EaseText(this, {
-            x: (enemy as any).x,
-            y: (enemy as any).y,
-            text: `+${enemy.maxHp}`,
-            color: "#619196",
-          });
-          this.resourceStates.gold.increase(enemy.maxHp);
-        });
-      }
-    );
   }
   createMap(scene: Phaser.Scene) {
     const map = scene.make.tilemap({
@@ -141,6 +100,20 @@ export class InGameScene extends Phaser.Scene {
       },
       loop: true,
       callbackScope: this,
+    });
+  }
+  constructor() {
+    super("InGameScene");
+    this.eventBus = new Phaser.Events.EventEmitter();
+  }
+  preload() {
+    this.load.tilemapTiledJSON("map", "assets/tiled/map.json");
+    this.load.image("Terrian", "assets/tiled/Tile1.0.1/Terrian.png");
+    this.load.image("bunker", "assets/bunker_100x100.png");
+    this.load.image("missile", "assets/bullet_8x8.png");
+    this.load.spritesheet("pixel_animals", "assets/pixel_animals.png", {
+      frameWidth: 16,
+      frameHeight: 16,
     });
   }
 }

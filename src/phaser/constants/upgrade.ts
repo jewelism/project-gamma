@@ -118,7 +118,7 @@ export const UPGRADE_V2 = {
         return computed(() => this.current * 10);
       },
       get time() {
-        return computed(() => this.current.value * 5);
+        return computed(() => (this.current.value / 10) * 5);
       },
       get desc() {
         return computed(

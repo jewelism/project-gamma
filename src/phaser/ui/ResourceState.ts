@@ -1,6 +1,14 @@
 import { TEXT_STYLE } from "@/phaser/constants";
 import { effect, signal } from "@preact/signals-core";
 
+export type ResourceStatesType = {
+  gold: ResourceState;
+  star: ResourceState;
+  increaseByIncome: () => number;
+  decreaseByUpgrade: (payload: { gold?: number; star?: number }) => void;
+  decreaseByPercent: (percent: number) => number;
+};
+
 export class ResourceState extends Phaser.GameObjects.Container {
   value = signal(0);
   backgroundColor: Phaser.GameObjects.Rectangle;

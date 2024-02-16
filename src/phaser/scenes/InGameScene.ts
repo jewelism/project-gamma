@@ -12,7 +12,7 @@ export class InGameScene extends Phaser.Scene {
   eventBus: Phaser.Events.EventEmitter;
   bunker: Bunker;
   enemies: Phaser.Physics.Arcade.Group;
-  timer: Phaser.Time.TimerEvent;
+  enemyTimer: Phaser.Time.TimerEvent;
   resourceStates: ResourceStatesType;
 
   create() {
@@ -44,7 +44,7 @@ export class InGameScene extends Phaser.Scene {
       color: "#619196",
       duration: 5000,
     }).setFontSize(20);
-    this.timer = this.time.addEvent({
+    this.enemyTimer = this.time.addEvent({
       delay: 900 / GAME.speed,
       callback: () => {
         if (index >= phaseData.length) {
@@ -67,12 +67,20 @@ export class InGameScene extends Phaser.Scene {
         if (count === phaseData[index].count) {
           index++;
           count = 0;
-          new EaseText(this, {
-            ...this.bunker.centerXY(),
-            text: `Phase ${index + 1}`,
-            color: "#619196",
-            duration: 2000,
-          }).setFontSize(20);
+          this.enemyTimer.paused = true;
+          this.time.addEvent({
+            delay: 10000,
+            callback: () => {
+              new EaseText(this, {
+                ...this.bunker.centerXY(),
+                text: `Phase ${index + 1}`,
+                color: "#619196",
+                duration: 2000,
+              }).setFontSize(20);
+              this.enemyTimer.paused = false;
+            },
+            callbackScope: this,
+          });
         }
       },
       loop: true,

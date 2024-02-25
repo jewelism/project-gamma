@@ -83,6 +83,9 @@ export class Button extends Phaser.GameObjects.Container {
       });
     };
     const onKeyUp = () => {
+      if (this.disabled.value) {
+        return;
+      }
       button.setAlpha(1);
       icon.setAlpha(1);
     };

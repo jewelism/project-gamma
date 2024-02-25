@@ -12,7 +12,7 @@ export function createBottomWrap(scene: Phaser.Scene) {
     .container(0, Number(scene.scale.gameSize.height) - UI.height)
     .setDepth(9999);
   const background = scene.add
-    .rectangle(0, 0, Number(scene.scale.gameSize.width), UI.height)
+    .rectangle(0, 0, Number(scene.scale.gameSize.width) + 2, UI.height)
     .setOrigin(0, 0)
     .setScrollFactor(0)
     .setFillStyle(0xdedaf4);

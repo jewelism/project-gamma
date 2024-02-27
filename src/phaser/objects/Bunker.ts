@@ -1,6 +1,7 @@
 import { UI } from "@/phaser/constants";
 import { UPGRADE_V2 } from "@/phaser/constants/upgrade";
 import { createTitleText } from "@/phaser/phaserUtils/titleText";
+import { InGameScene } from "@/phaser/scenes/InGameScene";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { createFlashFn } from "@/phaser/utils/helper";
 import { batch } from "@preact/signals-core";
@@ -57,6 +58,7 @@ export class Bunker extends Phaser.GameObjects.Container {
       "Game Over",
       Number(this.scene.game.config.height) / 2
     );
+    (this.scene as InGameScene).bgm.stop();
     this.scene.time.delayedCall(300, () => {
       const onKeydown = () => {
         this.scene.scene.start("StartScene");

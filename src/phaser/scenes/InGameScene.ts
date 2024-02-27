@@ -14,8 +14,15 @@ export class InGameScene extends Phaser.Scene {
   enemies: Phaser.Physics.Arcade.Group;
   enemyTimer: Phaser.Time.TimerEvent;
   resourceStates: ResourceStatesType;
+  bgm:
+    | Phaser.Sound.NoAudioSound
+    | Phaser.Sound.HTML5AudioSound
+    | Phaser.Sound.WebAudioSound;
 
   create() {
+    this.bgm = this.sound.add("bgm1");
+    this.bgm.volume = 0.5;
+    // this.bgm.play({ loop: true });
     this.scene.launch("InGameUIScene");
     // createTitleText(this, "Select Level", 100);
     this.createMap(this);
@@ -115,6 +122,7 @@ export class InGameScene extends Phaser.Scene {
     this.eventBus = new Phaser.Events.EventEmitter();
   }
   preload() {
+    this.load.audio("bgm1", "assets/audio/bgm1.mp3");
     this.load.tilemapTiledJSON("map", "assets/tiled/map.json");
     this.load.image("Terrian", "assets/tiled/Tile1.0.1/Terrian.png");
     this.load.image("bunker", "assets/bunker_100x100.png");

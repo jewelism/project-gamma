@@ -23,6 +23,9 @@ const config: Phaser.Types.Core.GameConfig = {
   },
   // parent: "body",
   render: { pixelArt: true, antialias: false },
+  dom: {
+    createContainer: true,
+  },
   scene: [
     // StartScene,
     InGameScene,

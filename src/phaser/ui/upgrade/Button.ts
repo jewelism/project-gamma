@@ -89,9 +89,10 @@ export class Button extends Phaser.GameObjects.Container {
       button.setAlpha(1);
       icon.setAlpha(1);
     };
-    const button = new Phaser.GameObjects.Rectangle(scene, 0, 0, width, height)
-      .setStrokeStyle(2, 0x8500ff)
-      .setOrigin(0, 0)
+    const button = new Phaser.GameObjects.Graphics(scene)
+      .lineStyle(2, 0x6aa5ff)
+      .fillRoundedRect(0, 0, width, height, 5)
+      .strokePath()
       .setInteractive()
       .on("pointerdown", () => {
         onKeyDown();
@@ -100,24 +101,29 @@ export class Button extends Phaser.GameObjects.Container {
       .on("pointerout", () => {
         onKeyUp();
       });
+
+    let shadow = new Phaser.GameObjects.Graphics(scene)
+      .lineStyle(4, 0x0006ff, 0.2)
+      .fillRoundedRect(button.x, button.y, width, height, 5)
+      .strokePath();
     const icon = new Phaser.GameObjects.Sprite(
       scene,
-      button.width / 2,
-      button.height / 2,
+      width / 2,
+      height / 2,
       spriteKey
     );
 
-    this.add([button, icon]);
+    this.add([button, shadow, icon]);
     scene.add.existing(this);
 
     Object.entries(this.text).forEach(([key, sig]) => {
       let x = 5;
       let y = 10;
       if (key.toLowerCase().includes("right")) {
-        x = button.width - 20;
+        x = width - 20;
       }
       if (key.toLowerCase().includes("bottom")) {
-        y = button.height - 10;
+        y = height - 10;
       }
       const text = new Phaser.GameObjects.Text(
         scene,
@@ -156,8 +162,8 @@ export class Button extends Phaser.GameObjects.Container {
 
     if (progressTime) {
       this.createProgress({ progressTime, button }).setPosition(
-        button.width / 2,
-        button.height / 2 + 10
+        width / 2,
+        height / 2 + 10
       );
     }
 

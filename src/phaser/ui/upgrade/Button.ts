@@ -3,6 +3,13 @@ import { InGameUIScene } from "@/phaser/scenes/ui/InGameUIScene";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { Signal, effect, signal } from "@preact/signals-core";
 
+const BUTTON_COLOR = {
+  blue: {
+    line: 0x6aa5ff,
+    shadow: 0x0006ff,
+  },
+};
+
 export class Button extends Phaser.GameObjects.Container {
   progress: GaugeBar;
   text: {
@@ -34,6 +41,7 @@ export class Button extends Phaser.GameObjects.Container {
       rightBottomText = "",
       allowZero = false,
       progressTime = 0,
+      color = "blue",
       onClick,
     }: {
       x: number;
@@ -48,6 +56,7 @@ export class Button extends Phaser.GameObjects.Container {
       rightBottomText?: string;
       allowZero?: boolean;
       progressTime?: number;
+      color?: keyof typeof BUTTON_COLOR;
       onClick?: (progressClick: () => void) => void;
     }
   ) {
@@ -89,21 +98,22 @@ export class Button extends Phaser.GameObjects.Container {
       button.setAlpha(1);
       icon.setAlpha(1);
     };
+
     const button = new Phaser.GameObjects.Graphics(scene)
-      .lineStyle(2, 0x6aa5ff)
+      .lineStyle(2, BUTTON_COLOR[color].line)
       .fillRoundedRect(0, 0, width, height, 5)
       .strokePath()
       .setInteractive()
       .on("pointerdown", () => {
         onKeyDown();
       })
-      .on("pointerup", onKeyUp)
+      .on("pointerup", () => onKeyUp())
       .on("pointerout", () => {
         onKeyUp();
       });
 
     let shadow = new Phaser.GameObjects.Graphics(scene)
-      .lineStyle(4, 0x0006ff, 0.2)
+      .lineStyle(4, BUTTON_COLOR[color].shadow, 0.2)
       .fillRoundedRect(button.x, button.y, width, height, 5)
       .strokePath();
     const icon = new Phaser.GameObjects.Sprite(

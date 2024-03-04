@@ -103,14 +103,13 @@ export class Button extends Phaser.GameObjects.Container {
       .lineStyle(2, BUTTON_COLOR[color].line)
       .fillRoundedRect(0, 0, width, height, 5)
       .strokePath()
-      .setInteractive()
-      .on("pointerdown", () => {
-        onKeyDown();
-      })
+      .setInteractive(
+        new Phaser.Geom.Rectangle(0, 0, width, height),
+        Phaser.Geom.Rectangle.Contains
+      )
+      .on("pointerdown", () => onKeyDown())
       .on("pointerup", () => onKeyUp())
-      .on("pointerout", () => {
-        onKeyUp();
-      });
+      .on("pointerout", () => onKeyUp());
 
     let shadow = new Phaser.GameObjects.Graphics(scene)
       .lineStyle(4, BUTTON_COLOR[color].shadow, 0.2)

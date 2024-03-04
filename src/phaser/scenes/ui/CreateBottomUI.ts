@@ -42,8 +42,9 @@ export function createBottomTap(scene: Phaser.Scene) {
       spriteKey: texture,
       shortcut: shortcutText,
       leftBottomText: desc,
-      onClick: () => {
+      onClick: (progressClick) => {
         this.uiEventBus.emit("tab", id);
+        progressClick();
       },
     });
     this.tapContainer.add(button);

@@ -1,4 +1,4 @@
-import { createTitleText } from "@/phaser/phaserUtils/titleText";
+import { CenterText } from "@/phaser/objects/CenterText";
 
 export class StartScene extends Phaser.Scene {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -10,8 +10,7 @@ export class StartScene extends Phaser.Scene {
   create() {
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    const title = createTitleText(this, "Escape from jewelry");
-
+    const title = new CenterText(this, { text: "Jewelry Animal Defence" });
     const pressAnyKeyText = this.add
       .text(title.x, title.y + 500, "press any key", {
         fontSize: "20px",

@@ -1,5 +1,4 @@
 import { CenterText } from "@/phaser/objects/CenterText";
-import { createTitleText } from "@/phaser/phaserUtils/titleText";
 
 export class InGamePauseScene extends Phaser.Scene {
   constructor() {
@@ -11,23 +10,18 @@ export class InGamePauseScene extends Phaser.Scene {
   createPause() {
     let isPaused = false;
     let text = new CenterText(this, { text: "PAUSE" }).setAlpha(0);
-    console.log("text", text.alpha);
-
     const onKeyDown = () => {
       if (isPaused) {
         isPaused = false;
         this.scene.get("InGameScene").scene.resume();
         this.scene.get("InGameUIScene").scene.resume();
         text.setAlpha(0);
-        console.log("resume");
-
         return;
       }
       isPaused = true;
       this.scene.get("InGameScene").scene.pause();
       this.scene.get("InGameUIScene").scene.pause();
       text.setAlpha(1);
-      console.log("pause");
     };
     this.input.keyboard
       .addKey(Phaser.Input.Keyboard.KeyCodes.ESC)

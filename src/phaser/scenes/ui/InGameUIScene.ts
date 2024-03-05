@@ -45,9 +45,7 @@ export class InGameUIScene extends Phaser.Scene {
     createUtilButtons.bind(this)(this);
     createUnitsTabButtons.bind(this)(this);
     this.uiEventBus.emit("tab", "addUnit");
-    // this.createTimer(1, () => {
-    //   console.log("game over");
-    // });
+
     effect(() => {
       const { resourceStates } = this.scene.get("InGameScene") as InGameScene;
       resourceStates.gold.value.value;

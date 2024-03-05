@@ -1,9 +1,8 @@
-// import { createTitleText } from "@/phaser/phaserUtils/titleText";
 import { GAME } from "@/phaser/constants";
 import { getPhaseData } from "@/phaser/constants/phase";
 import { Bunker } from "@/phaser/objects/Bunker";
 import { Enemy } from "@/phaser/objects/Enemy";
-import { Missile } from "@/phaser/objects/Missile";
+import { InGameUIScene } from "@/phaser/scenes/ui/InGameUIScene";
 import { EaseText } from "@/phaser/ui/EaseText";
 import { ResourceStatesType } from "@/phaser/ui/ResourceState";
 import { getEnemyRandomDirectionXY } from "@/phaser/utils/helper";
@@ -75,18 +74,17 @@ export class InGameScene extends Phaser.Scene {
           index++;
           count = 0;
           this.enemyTimer.paused = true;
-          this.time.addEvent({
-            delay: 10000,
-            callback: () => {
-              new EaseText(this, {
-                ...this.bunker.centerXY(),
-                text: `Phase ${index + 1}`,
-                color: "#619196",
-                duration: 2000,
-              }).setFontSize(20);
-              this.enemyTimer.paused = false;
-            },
-            callbackScope: this,
+          const inGameUIScene = this.scene.get(
+            "InGameUIScene"
+          ) as InGameUIScene;
+          inGameUIScene.createTimer(1 / 6, () => {
+            new EaseText(this, {
+              ...this.bunker.centerXY(),
+              text: `Phase ${index + 1}`,
+              color: "#619196",
+              duration: 2000,
+            }).setFontSize(20);
+            this.enemyTimer.paused = false;
           });
         }
       },

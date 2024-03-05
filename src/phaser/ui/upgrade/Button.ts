@@ -25,6 +25,7 @@ export class Button extends Phaser.GameObjects.Container {
   };
   progressInUse: boolean = false;
   disabled: Signal<boolean> = signal(false);
+  color: string;
 
   constructor(
     scene: Phaser.Scene,
@@ -61,6 +62,9 @@ export class Button extends Phaser.GameObjects.Container {
     }
   ) {
     super(scene, x, y);
+    this.width = width;
+    this.height = height;
+    this.color = color;
 
     this.text.leftTopText = signal(shortcut ? shortcut : leftTopText);
     this.text.rightTopNumber = signal(rightTopNumber);
@@ -86,7 +90,7 @@ export class Button extends Phaser.GameObjects.Container {
         if (progressTime) {
           this.progressInUse = true;
           this.setProgressTime(progressTime);
-          this.createProgress({ progressTime, button });
+          this.createProgress({ progressTime });
           this.add(this.progress);
         }
       });
@@ -170,10 +174,7 @@ export class Button extends Phaser.GameObjects.Container {
     });
 
     if (progressTime) {
-      this.createProgress({ progressTime, button }).setPosition(
-        width / 2,
-        height / 2 + 10
-      );
+      this.createProgress({ progressTime });
     }
 
     if (shortcut) {
@@ -188,14 +189,16 @@ export class Button extends Phaser.GameObjects.Container {
     this.setVisible(bool);
     return this;
   }
-  createProgress({ progressTime, button }) {
+  createProgress({ progressTime }) {
     this.progress = new GaugeBar(this.scene, {
       max: progressTime,
       current: 0,
-      width: button.width,
-      height: 5,
-      color: 0xffadad,
-    }).setPosition(button.width / 2, button.height / 2 + 10);
+      width: this.width,
+      height: this.height,
+      color: BUTTON_COLOR[this.color].line,
+    })
+      .setAlpha(0.2)
+      .setPosition(this.width / 2, -10);
     return this.progress;
   }
   setProgressTime(time: number) {

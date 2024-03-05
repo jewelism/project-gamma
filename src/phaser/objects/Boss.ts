@@ -9,8 +9,8 @@ export class Boss extends Phaser.GameObjects.GameObject {
       grade: grade * 2,
       spriteKey,
       frameNo,
-    }).setScale(3);
-    enemy.attackRange = 200;
+    }).setScale(2.5);
+    enemy.attackRange = 150;
     scene.add.existing(enemy);
     return enemy;
   }

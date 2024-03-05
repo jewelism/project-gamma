@@ -1,4 +1,6 @@
 import { UPGRADE_V2, getUpgradeTabName } from "@/phaser/constants/upgrade";
+import { Boss } from "@/phaser/objects/Boss";
+import { Enemy } from "@/phaser/objects/Enemy";
 import { InGameScene } from "@/phaser/scenes/InGameScene";
 import { UPGRADE_BUTTON } from "@/phaser/scenes/ui/InGameUIScene";
 import { Button } from "@/phaser/ui/upgrade/Button";
@@ -7,7 +9,10 @@ import { getBetweenAroundInfo } from "@/phaser/utils/helper";
 export function createUtilButtons(scene: Phaser.Scene) {
   const { rectWidth, getLine, getX } = getBetweenAroundInfo(scene, 1);
   const mapUpgradeButton = (
-    [id, { spriteKey, desc, shortcutText, time }],
+    [id, { current, spriteKey, desc, shortcutText, time }]: [
+      keyof typeof UPGRADE_V2.util,
+      any
+    ],
     index
   ) => {
     const line = getLine(index);
@@ -30,6 +35,18 @@ export function createUtilButtons(scene: Phaser.Scene) {
           resourceStates.decreaseByUpgrade({
             gold: UPGRADE_V2[getUpgradeTabName(id)][id].cost,
           });
+        }
+        if (id === "summonBoss") {
+          const inGameScene = scene.scene.get("InGameScene") as InGameScene;
+          const boss = new Boss(inGameScene, {
+            x: 300,
+            y: -200,
+            grade: current ** 2,
+            spriteKey: "pixel_animals",
+            frameNo: current * 2,
+          });
+          (boss as Enemy).hpBar.showText = true;
+          inGameScene.enemies.add(boss);
         }
         progressClick();
       },

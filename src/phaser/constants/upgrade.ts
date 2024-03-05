@@ -128,6 +128,21 @@ export const UPGRADE_V2 = {
       shortcutText: "Z",
       spriteKey: "defence1",
     },
+    summonBoss: {
+      current: signal(1),
+      max: 100,
+      get reward() {
+        return computed(() => (this.current * 2) ** 2 + 1000);
+      },
+      get desc() {
+        return computed(() => `(${this.reward}G) summon boss`);
+      },
+      get time() {
+        return computed(() => 0.2);
+      },
+      shortcutText: "V",
+      spriteKey: "boss1",
+    },
   },
 };
 

@@ -23,6 +23,8 @@ export class InGameScene extends Phaser.Scene {
     this.bgm.volume = 0.5;
     // this.bgm.play({ loop: true });
     this.scene.launch("InGameUIScene");
+    this.scene.launch("InGamePauseScene");
+
     // createTitleText(this, "Select Level", 100);
     this.createMap(this);
 

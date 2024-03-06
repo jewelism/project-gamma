@@ -150,6 +150,9 @@ export const UPGRADE_V2 = {
     attackSpeed: {
       current: signal(1),
       max: 20,
+      get bonusSpeed() {
+        return computed(() => this.current * 20);
+      },
       get cost() {
         return computed(() => 1);
       },

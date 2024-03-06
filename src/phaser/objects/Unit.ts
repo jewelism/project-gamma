@@ -56,13 +56,15 @@ export class Unit extends Phaser.GameObjects.Zone {
     scene.add.existing(this);
 
     this.scene.game.config.physics.arcade?.debug && this.drawAttackRange();
-    console.log(UPGRADE_V2.attackDamage);
 
     effect(() => {
       const gradeStart = Math.ceil(this.grade / 3);
       const { current } =
         UPGRADE_V2.attackDamage[`attackDamage${gradeStart}_${gradeStart + 2}`];
       this.damage += current.value * this.grade;
+    });
+    effect(() => {
+      this.attackSpeed -= UPGRADE_V2.star.attackSpeed.bonusSpeed.value;
     });
   }
   preUpdate(_time: number, _delta: number): void {

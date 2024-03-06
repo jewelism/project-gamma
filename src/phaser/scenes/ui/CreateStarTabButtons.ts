@@ -31,9 +31,7 @@ export function createStarTabButtons(scene: Phaser.Scene) {
           star: UPGRADE_V2[getUpgradeTabName(id)][id].cost,
         });
         current.value += 1;
-        if (id !== "attackSpeed") {
-          // TODO: 공속늘리기
-        }
+        localStorage.setItem(id, String(current));
         progressClick();
       },
     })

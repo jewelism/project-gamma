@@ -15,6 +15,7 @@ import { createAttackDamageButtons } from "@/phaser/scenes/ui/CreateAttackDamage
 import { createUtilButtons } from "@/phaser/scenes/ui/CreateUtilButtons";
 import { EaseText } from "@/phaser/ui/EaseText";
 import { createStarTabButtons } from "@/phaser/scenes/ui/CreateStarTabButtons";
+import { setStorageData } from "@/phaser/scenes/ui/SetStorageData";
 
 export const UPGRADE_BUTTON = {
   height: 50,
@@ -47,6 +48,7 @@ export class InGameUIScene extends Phaser.Scene {
     createUtilButtons.bind(this)(this);
     createUnitsTabButtons.bind(this)(this);
     createStarTabButtons.bind(this)(this);
+    setStorageData();
     this.uiEventBus.emit("tab", "addUnit");
 
     effect(() => {

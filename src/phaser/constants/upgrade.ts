@@ -8,6 +8,9 @@ export const getUpgradeTabName = (id: string) => {
   if (Object.keys(UPGRADE_V2.util).includes(id)) {
     return "util";
   }
+  if (Object.keys(UPGRADE_V2.star).includes(id)) {
+    return "star";
+  }
   return removeExceptAlphabets(id);
 };
 function createAttackDamage(id: string) {
@@ -144,6 +147,19 @@ export const UPGRADE_V2 = {
       spriteKey: "boss1",
     },
   },
+  star: {
+    attackSpeed: {
+      current: signal(1),
+      max: 20,
+      get cost() {
+        return computed(() => 1);
+      },
+      get desc() {
+        return computed(() => `(${this.cost}★) attack speed`);
+      },
+      spriteKey: "defence1",
+    },
+  },
 };
 
 export const TAP_BUTTON_LIST = [
@@ -165,5 +181,11 @@ export const TAP_BUTTON_LIST = [
     shortcutText: "R",
     desc: "units",
     texture: "sword1",
+  },
+  {
+    id: "star",
+    shortcutText: "T",
+    desc: "★",
+    texture: "star1",
   },
 ];

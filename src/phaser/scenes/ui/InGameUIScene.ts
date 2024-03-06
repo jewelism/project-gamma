@@ -14,6 +14,7 @@ import { createUnitsTabButtons } from "@/phaser/scenes/ui/CreateUnitsTabButtons"
 import { createAttackDamageButtons } from "@/phaser/scenes/ui/CreateAttackDamageButtons";
 import { createUtilButtons } from "@/phaser/scenes/ui/CreateUtilButtons";
 import { EaseText } from "@/phaser/ui/EaseText";
+import { createStarTabButtons } from "@/phaser/scenes/ui/CreateStarTabButtons";
 
 export const UPGRADE_BUTTON = {
   height: 50,
@@ -29,6 +30,7 @@ export class InGameUIScene extends Phaser.Scene {
     addUnit: Phaser.GameObjects.Group;
     util: Phaser.GameObjects.Group;
     unit: Phaser.GameObjects.Group;
+    star: Phaser.GameObjects.Group;
   } = {} as any;
 
   constructor() {
@@ -44,6 +46,7 @@ export class InGameUIScene extends Phaser.Scene {
     createAttackDamageButtons.bind(this)(this);
     createUtilButtons.bind(this)(this);
     createUnitsTabButtons.bind(this)(this);
+    createStarTabButtons.bind(this)(this);
     this.uiEventBus.emit("tab", "addUnit");
 
     effect(() => {
@@ -54,9 +57,12 @@ export class InGameUIScene extends Phaser.Scene {
           if (button.name.startsWith("grade")) {
             return;
           }
-          const cost =
-            UPGRADE_V2[getUpgradeTabName(button.name)][button.name].cost?.value;
+          const tabName = getUpgradeTabName(button.name);
+          const cost = UPGRADE_V2[tabName][button.name].cost?.value;
           button.disabled.value = resourceStates.gold.value.value < cost;
+          if (tabName === "star") {
+            button.disabled.value = resourceStates.star.value.value < cost;
+          }
         });
       });
     });

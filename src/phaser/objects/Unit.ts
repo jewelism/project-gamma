@@ -1,10 +1,12 @@
 import { GAME } from "@/phaser/constants";
+import { UPGRADE_V2 } from "@/phaser/constants/upgrade";
 import { Bunker } from "@/phaser/objects/Bunker";
 import { Enemy } from "@/phaser/objects/Enemy";
 import { Missile } from "@/phaser/objects/Missile";
 import { InGameScene } from "@/phaser/scenes/InGameScene";
 import { EaseText } from "@/phaser/ui/EaseText";
 import { getRandomEnemyInRange } from "@/phaser/utils/helper";
+import { effect } from "@preact/signals-core";
 
 export class Unit extends Phaser.GameObjects.Zone {
   owner: Bunker;
@@ -27,7 +29,7 @@ export class Unit extends Phaser.GameObjects.Zone {
     this.owner = owner;
     this.grade = grade;
 
-    this.damage = 1 * this.grade;
+    this.damage = 2 * this.grade;
     this.attackRange = 100 + this.grade * 10;
     this.attackSpeed = 2000 - this.grade * 10;
 
@@ -54,6 +56,14 @@ export class Unit extends Phaser.GameObjects.Zone {
     scene.add.existing(this);
 
     this.scene.game.config.physics.arcade?.debug && this.drawAttackRange();
+    console.log(UPGRADE_V2.attackDamage);
+
+    effect(() => {
+      const gradeStart = Math.ceil(this.grade / 3);
+      const { current } =
+        UPGRADE_V2.attackDamage[`attackDamage${gradeStart}_${gradeStart + 2}`];
+      this.damage += current.value * this.grade;
+    });
   }
   preUpdate(_time: number, _delta: number): void {
     this.shoot();

@@ -99,7 +99,6 @@ export class InGameUIScene extends Phaser.Scene {
           duration: 2000,
         }).setFontSize(20);
       }
-      // TODO: gold가 마이너스가 되는경우가 발생하고있음
     });
     this.uiEventBus.on("tab", (id: string) => {
       Object.values(this.buttonGroup).forEach((group) => {

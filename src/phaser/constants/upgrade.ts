@@ -52,9 +52,10 @@ const addUnit = Array.from({ length: 15 }, (_, i) => `addUnit${i + 1}`).reduce(
   },
   {}
 );
+
 const attackDamage = Array.from(
   { length: 5 },
-  (_, i) => `attackDamage${i + 1}_${(i + 1) * 3}`
+  (_, i) => `attackDamage${i * 3 + 1}_${i * 3 + 3}`
 ).reduce((acc, key) => {
   return { ...acc, ...createAttackDamage(key) };
 }, {});
@@ -63,8 +64,6 @@ export const UPGRADE_V2 = {
   addUnit,
   attackDamage,
   util: {
-    // TODO: 보스만들기. 보스잡고 얻은 별로 할수있는거 만들기.
-    // 게임 끝나고 메뉴에서 별도 보상 업그레이드?
     gamble: {
       current: signal(1),
       max: 100,

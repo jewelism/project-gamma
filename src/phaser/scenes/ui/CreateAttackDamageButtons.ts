@@ -23,7 +23,9 @@ export function createAttackDamageButtons(scene: Phaser.Scene) {
         });
         progressClick();
         button.text.rightTopNumber.value += 1;
-        increaseAttackDamage.bind(this)({ id });
+        const upgradeObj = UPGRADE_V2.attackDamage[id];
+        upgradeObj.current.value += 1;
+        upgradeObj.cost.value *= 2;
       },
     })
       .setName(id)
@@ -35,18 +37,4 @@ export function createAttackDamageButtons(scene: Phaser.Scene) {
     Object.entries(UPGRADE_V2.attackDamage).map(mapUpgradeButton)
   );
   this.upgradeButtonContainer.add(this.buttonGroup.attackDamage.getChildren());
-}
-
-function increaseAttackDamage({ id }) {
-  const InGameScene = this.scene.get("InGameScene") as InGameScene;
-  const [gradeStart, gradeEnd] = getUnitGradeById(id);
-  // TODO: 이건 벙커안에있는애들만 강해지는데, 앞으로 추가되는애들도 강해져야함
-  InGameScene.bunker.units.getChildren().forEach((unit: Unit) => {
-    if (unit.grade >= gradeStart && unit.grade <= gradeEnd) {
-      unit.damage += unit.grade;
-    }
-  });
-  const upgradeObj = UPGRADE_V2.attackDamage[id];
-  upgradeObj.current.value += 1;
-  upgradeObj.cost.value *= 2;
 }

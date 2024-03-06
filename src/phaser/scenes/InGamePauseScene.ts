@@ -1,6 +1,9 @@
 import { CenterText } from "@/phaser/objects/CenterText";
+import { signal } from "@preact/signals-core";
 
 export class InGamePauseScene extends Phaser.Scene {
+  gameover = signal(false);
+
   constructor() {
     super("InGamePauseScene");
   }
@@ -11,6 +14,9 @@ export class InGamePauseScene extends Phaser.Scene {
     let isPaused = false;
     let text = new CenterText(this, { text: "PAUSE" }).setAlpha(0);
     const onKeyDown = () => {
+      if (this.gameover.value) {
+        return;
+      }
       if (isPaused) {
         isPaused = false;
         this.scene.get("InGameScene").scene.resume();

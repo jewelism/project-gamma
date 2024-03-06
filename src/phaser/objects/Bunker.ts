@@ -1,6 +1,7 @@
 import { UI } from "@/phaser/constants";
 import { UPGRADE_V2 } from "@/phaser/constants/upgrade";
 import { CenterText } from "@/phaser/objects/CenterText";
+import { InGamePauseScene } from "@/phaser/scenes/InGamePauseScene";
 import { InGameScene } from "@/phaser/scenes/InGameScene";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { createFlashFn } from "@/phaser/utils/helper";
@@ -51,18 +52,23 @@ export class Bunker extends Phaser.GameObjects.Container {
     if (!this.isDestroyed()) {
       return;
     }
-    this.scene.scene.pause();
     this.setAlpha(0.1);
     new CenterText(this.scene, { text: "Game Over" });
+    this.scene.scene.pause();
+    this.scene.scene.get("InGameUIScene").scene.pause();
+    const InGamePauseScene = this.scene.scene.get(
+      "InGamePauseScene"
+    ) as InGamePauseScene;
+    InGamePauseScene.gameover.value = true;
     (this.scene as InGameScene).bgm.stop();
-    this.scene.time.delayedCall(300, () => {
+    InGamePauseScene.time.delayedCall(100, () => {
       const onKeydown = () => {
-        this.scene.scene.start("StartScene");
+        InGamePauseScene.scene.start("StartScene");
       };
-      this.scene.input.keyboard.on("keydown", onKeydown);
-      this.scene.input.on("pointerdown", onKeydown);
+      InGamePauseScene.input.keyboard.on("keydown", onKeydown);
+      InGamePauseScene.input.on("pointerdown", onKeydown);
+      this.setAlpha(0);
     });
-    this.destroy();
   }
   upgrade() {
     batch(() => {

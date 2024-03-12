@@ -18,12 +18,18 @@ export function createAttackDamageButtons(scene: Phaser.Scene) {
       leftBottomText: desc,
       onClick: (progressClick) => {
         const InGameScene = this.scene.get("InGameScene") as InGameScene;
+
+        const upgradeObj = UPGRADE_V2.attackDamage[id];
+        if (upgradeObj.current.value >= upgradeObj.max) {
+          button.disabled.value = true;
+          return;
+        }
+
         InGameScene.resourceStates.decreaseByUpgrade({
-          gold: UPGRADE_V2.attackDamage[id].cost.value,
+          gold: upgradeObj.cost.value,
         });
         progressClick();
         button.text.rightTopNumber.value += 1;
-        const upgradeObj = UPGRADE_V2.attackDamage[id];
         upgradeObj.current.value += 1;
         upgradeObj.cost.value *= 2;
       },

@@ -5,13 +5,12 @@ import { UPGRADE_BUTTON } from "@/phaser/scenes/ui/InGameUIScene";
 import { EaseText } from "@/phaser/ui/EaseText";
 import { Button } from "@/phaser/ui/upgrade/Button";
 import { getBetweenAroundInfo } from "@/phaser/utils/helper";
+import { effect } from "@preact/signals-core";
 
 export function createAddUnitButtons(scene: Phaser.Scene) {
   const { rectWidth, getLine, getX } = getBetweenAroundInfo(scene, 3);
   const mapUpgradeButton = ([id, { spriteKey, desc }], index) => {
-    // const mapUpgradeButton = ([id, { spriteKey, desc, shortcutText }], index) => {
     const line = getLine(index);
-
     const button = new Button(scene, {
       x: getX(index),
       y: line * UPGRADE_BUTTON.height + UPGRADE_BUTTON.paddingBottom * line,
@@ -21,7 +20,15 @@ export function createAddUnitButtons(scene: Phaser.Scene) {
       leftBottomText: desc,
       // shortcut: shortcutText,
       onClick: (progressClick) => {
-        increaseUnit.bind(this)({ id }) && progressClick();
+        const unit = increaseUnit.bind(this)({ id });
+        if (unit) {
+          progressClick();
+          effect(() => {
+            console.log("unit.damage.value", unit.damage.value);
+
+            button.text.rightTopNumber.value = unit.damage.value;
+          });
+        }
       },
     })
       .setName(id)
@@ -64,7 +71,7 @@ function increaseUnit({ id }) {
     duration: 3000,
   }).setFontSize(20);
   increaseUnitStateButton.bind(this)(grade);
-  return true;
+  return unit;
 }
 function increaseUnitStateButton(grade: number) {
   const button = this.buttonGroup.unit

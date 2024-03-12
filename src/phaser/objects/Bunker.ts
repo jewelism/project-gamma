@@ -24,7 +24,7 @@ export class Bunker extends Phaser.GameObjects.Container {
     this.sprite = new Phaser.Physics.Arcade.Sprite(scene, 0, 0, "bunker");
     this.units = new Phaser.GameObjects.Group(scene);
     this.hpBar = new GaugeBar(this.scene, {
-      max: UPGRADE_V2.util.upgradeBunker.current.value * 20,
+      max: UPGRADE_V2.util.upgradeBunker.current.value * 30,
       width: 120,
       height: 16,
       showText: true,

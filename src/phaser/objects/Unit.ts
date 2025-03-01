@@ -46,7 +46,7 @@ export class Unit extends Phaser.GameObjects.Zone {
             x: (enemy as any).x,
             y: (enemy as any).y,
             text: `+${enemy.maxHp}`,
-            color: "#619196",
+            color: `#619196`,
           });
           (this.scene as InGameScene).resourceStates.gold.increase(enemy.maxHp);
         });
@@ -65,6 +65,10 @@ export class Unit extends Phaser.GameObjects.Zone {
     });
     effect(() => {
       this.attackSpeed -= UPGRADE_V2.star.attackSpeed.bonusSpeed.value;
+    });
+    effect(() => {
+      this.damage += UPGRADE_V2.star.attackDamage.current.value * grade * 0.5;
+      console.log(this.damage);
     });
   }
   preUpdate(_time: number, _delta: number): void {

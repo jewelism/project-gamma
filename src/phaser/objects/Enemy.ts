@@ -1,6 +1,7 @@
 import { GAME } from "@/phaser/constants";
 import { Bunker } from "@/phaser/objects/Bunker";
 import { InGameScene } from "@/phaser/scenes/InGameScene";
+import { EaseText } from "@/phaser/ui/EaseText";
 import { GaugeBar } from "@/phaser/ui/GaugeBar";
 import { createFlashFn, isOutOfRange } from "@/phaser/utils/helper";
 
@@ -83,10 +84,10 @@ export class Enemy extends Phaser.GameObjects.Container {
 
     // 데미지표시
     // new EaseText(this.scene, {
-    //   x: this.x,
-    //   y: this.y,
+    //   x: this.x + Phaser.Math.Between(-10, 10),
+    //   y: this.y + Phaser.Math.Between(-10, 10),
     //   text: `${amount}`,
-    //   color: "#ff0000",
+    //   color: `#619${Phaser.Math.Between(399, 100)}`,
     // });
     if (this.hp <= 0) {
       destroyFn?.();

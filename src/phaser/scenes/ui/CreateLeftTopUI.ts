@@ -9,9 +9,11 @@ export class CreateLeftTopUI {
     const InGameScene = scene.scene.get("InGameScene") as InGameScene;
     InGameScene.resourceStates = {
       gold: new ResourceState(scene, { x, y: 35, texture: "goldBar" }).increase(
-        300
+        3000
       ),
-      star: new ResourceState(scene, { x, y: 60, texture: "star" }),
+      star: new ResourceState(scene, { x, y: 60, texture: "star" }).increase(
+        20
+      ),
       increaseByIncome() {
         const amount = Math.floor(
           this.gold.value * (UPGRADE_V2.util.income.percent.value / 100)

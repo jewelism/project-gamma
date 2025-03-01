@@ -24,9 +24,7 @@ export function createAddUnitButtons(scene: Phaser.Scene) {
         if (unit) {
           progressClick();
           effect(() => {
-            console.log("unit.damage.value", unit.damage.value);
-
-            button.text.rightTopNumber.value = unit.damage.value;
+            button.text.rightTopNumber.value = unit.damage;
           });
         }
       },

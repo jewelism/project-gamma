@@ -161,6 +161,17 @@ export const UPGRADE_V2 = {
       },
       spriteKey: "defence1",
     },
+    attackDamage: {
+      current: signal(1),
+      max: 20,
+      get cost() {
+        return computed(() => 1);
+      },
+      get desc() {
+        return computed(() => `(${this.cost}★) attack damage`);
+      },
+      spriteKey: "defence1",
+    },
   },
 };
 
